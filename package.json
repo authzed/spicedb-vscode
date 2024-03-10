@@ -22,7 +22,11 @@
         "extensions": [
           ".zed"
         ],
-        "configuration": "./language-configuration.json"
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./icons/authzed.svg",
+          "dark": "./icons/authzed.svg"
+        }
       }
     ],
     "grammars": [
