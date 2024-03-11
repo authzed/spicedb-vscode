@@ -6,6 +6,10 @@
   "engines": {
     "vscode": "^1.87.0"
   },
+  "extensionKind": [
+    "ui",
+    "workspace"
+  ],
   "categories": [
     "Other"
   ],
@@ -38,10 +42,45 @@
           "meta.embedded.block.cel": "cel"
         }
       }
-    ]
+    ],
+    "viewsContainers": {
+      "panel": [
+        {
+          "id": "check-watches",
+          "title": "Check Watches",
+          "icon": "./icons/authzed.svg"
+        }
+      ]
+    },
+    "views": {
+      "check-watches": [
+        {
+          "type": "webview",
+          "id": "spicedb.checkWatchView",
+          "name": "Check Watches"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "spicedb.addCheckWatch",
+        "category": "Check Watches",
+        "title": "Add Check Watch",
+        "icon": "$(watch-expressions-add)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "spicedb.addCheckWatch",
+          "group": "navigation",
+          "when": "view == spicedb.checkWatchView"
+        }
+      ]
+    }
   },
   "extensionDependencies": [
-      "hmarr.cel"
+    "hmarr.cel"
   ],
   "activationEvents": [],
   "main": "./out/extension.js",

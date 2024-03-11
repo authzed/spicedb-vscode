@@ -1,0 +1,54 @@
+{
+  "name": "check-watch-panel",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@protobuf-ts/plugin": "^2.9.3",
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/react": "^13.0.0",
+    "@testing-library/user-event": "^13.2.1",
+    "@types/jest": "^27.0.1",
+    "@types/node": "^16.7.13",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@types/uuid": "^9.0.8",
+    "@vscode/codicons": "^0.0.35",
+    "@vscode/webview-ui-toolkit": "^1.4.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.4.2",
+    "uuid": "^9.0.1",
+    "vscode": "^1.1.37",
+    "web-vitals": "^2.1.0",
+    "yaml": "^2.4.1"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.16.7"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build && yarn run build-dist",
+    "build-dist": "cd build && cp static/js/*.js main.js && cp static/css/*.css main.css",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
