@@ -1,4 +1,10 @@
 import * as vscode from 'vscode';
+import {
+  LanguageClient,
+  LanguageClientOptions,
+  ServerOptions,
+  TransportKind,
+} from 'vscode-languageclient/node';
 import { CheckWatchProvider } from './checkwatchprovider';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -50,6 +56,45 @@ export function activate(context: vscode.ExtensionContext) {
       }
     )
   );
+
+  startLanguageServer();
+}
+
+async function startLanguageServer() {
+  // Start the LSP hooks using the language server found in the SpiceDB binary.
+  const serverBinary = 'spicedb';
+
+  const serverOptions: ServerOptions = {
+    run: {
+      command: serverBinary,
+      args: ['lsp'],
+      transport: TransportKind.stdio,
+    },
+    debug: {
+      command: serverBinary,
+      args: ['lsp'],
+      transport: TransportKind.stdio,
+    },
+  };
+
+  const clientOptions: LanguageClientOptions = {
+    documentSelector: [{ scheme: 'file', language: 'spicedb' }],
+    synchronize: {
+      fileEvents: vscode.workspace.createFileSystemWatcher('**/.zed'),
+    },
+  };
+
+  // Create the language client and start the client.
+  const client = new LanguageClient(
+    'spicedbLanguageServer',
+    'SpiceDB Language Server',
+    serverOptions,
+    clientOptions
+  );
+
+  // Start the client. This will also launch the server.
+  await client.start();
+  console.log('spicedb-vscode is now active with its LSP running');
 }
 
 export function deactivate() {}
