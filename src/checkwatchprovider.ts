@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
+import { Uri, Webview } from 'vscode';
 
 import fs from 'fs';
-import { Uri, Webview } from 'vscode';
 
 function getUri(webview: Webview, extensionUri: Uri, pathList: string[]) {
   return webview.asWebviewUri(Uri.joinPath(extensionUri, ...pathList));
@@ -14,16 +14,8 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
 
   constructor(private readonly _extensionUri: vscode.Uri) {}
 
-  public resolveWebviewView(
-    webviewView: vscode.WebviewView,
-    context: vscode.WebviewViewResolveContext,
-    _token: vscode.CancellationToken
-  ) {
+  public resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext, _token: vscode.CancellationToken) {
     this._view = webviewView;
-    /*this._view.badge = {
-			tooltip: 'hi there',
-			value: 42,
-		}*/
 
     webviewView.webview.options = {
       // Allow scripts in the webview
@@ -35,16 +27,10 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
       switch (data.type) {
         case 'ready':
           if (
-            vscode.window.activeTextEditor?.document.uri.fsPath.endsWith(
-              '.zed'
-            ) ||
-            vscode.window.activeTextEditor?.document.uri.fsPath.endsWith(
-              '.zed.yaml'
-            )
+            vscode.window.activeTextEditor?.document.uri.fsPath.endsWith('.zed') ||
+            vscode.window.activeTextEditor?.document.uri.fsPath.endsWith('.zed.yaml')
           ) {
-            this.performUpdate(
-              vscode.window.activeTextEditor?.document.uri.fsPath
-            );
+            this.performUpdate(vscode.window.activeTextEditor?.document.uri.fsPath);
           }
           break;
       }
@@ -113,30 +99,10 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
   }
 
   private _getHtmlForWebview(webview: vscode.Webview) {
-    const cssUri = getUri(webview, this._extensionUri, [
-      'src',
-      'check-watch-panel',
-      'build',
-      'main.css',
-    ]);
-    const scriptUri = getUri(webview, this._extensionUri, [
-      'src',
-      'check-watch-panel',
-      'build',
-      'main.js',
-    ]);
-    const goScriptUri = getUri(webview, this._extensionUri, [
-      'src',
-      'check-watch-panel',
-      'public',
-      'wasm_exec.js',
-    ]);
-    const wasmBundleUri = getUri(webview, this._extensionUri, [
-      'src',
-      'check-watch-panel',
-      'public',
-      'main.wasm',
-    ]);
+    const cssUri = getUri(webview, this._extensionUri, ['src', 'check-watch-panel', 'build', 'main.css']);
+    const scriptUri = getUri(webview, this._extensionUri, ['src', 'check-watch-panel', 'build', 'main.js']);
+    const goScriptUri = getUri(webview, this._extensionUri, ['src', 'check-watch-panel', 'public', 'wasm_exec.js']);
+    const wasmBundleUri = getUri(webview, this._extensionUri, ['src', 'check-watch-panel', 'public', 'main.wasm']);
 
     // From: https://github.com/microsoft/vscode-extension-samples/blob/main/webview-codicons-sample/src/extension.ts
     const codiconsUri = getUri(webview, this._extensionUri, [
@@ -149,11 +115,7 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
     ]);
 
     const nonce = getNonce();
-
-    const activeFilePath =
-      vscode.window.activeTextEditor?.document.uri.fsPath ?? '';
-
-    //                 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
+    const activeFilePath = vscode.window.activeTextEditor?.document.uri.fsPath ?? '';
 
     return `<!DOCTYPE html>
 			<html lang="en">
@@ -179,8 +141,7 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
 
 function getNonce() {
   let text = '';
-  const possible =
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   for (let i = 0; i < 32; i++) {
     text += possible.charAt(Math.floor(Math.random() * possible.length));
   }

@@ -1,20 +1,11 @@
-import './App.css';
-
-import {
-  VSCodeButton,
-  VSCodePanelView,
-  VSCodeProgressRing,
-  VSCodeTextField,
-} from '@vscode/webview-ui-toolkit/react';
-
 import { useEffect, useState } from 'react';
+
+import { VSCodeButton, VSCodePanelView, VSCodeProgressRing, VSCodeTextField } from '@vscode/webview-ui-toolkit/react';
 import yaml from 'yaml';
+
+import './App.css';
 import { useDeveloperService } from './services/developerservice';
-import {
-  LiveCheckItem,
-  LiveCheckItemStatus,
-  useLiveCheckService,
-} from './services/livecheck';
+import { LiveCheckItem, LiveCheckItemStatus, useLiveCheckService } from './services/livecheck';
 
 function App() {
   useEffect(() => {
@@ -22,9 +13,7 @@ function App() {
     vscode.postMessage({ type: 'ready' });
   }, []);
 
-  const [activeFilePath, setActiveFilePath] = useState<string | undefined>(
-    (window as any).ACTIVE_FILE_PATH
-  );
+  const [activeFilePath, setActiveFilePath] = useState<string | undefined>((window as any).ACTIVE_FILE_PATH);
 
   const devService = useDeveloperService();
   const liveCheckService = useLiveCheckService(devService);
@@ -42,11 +31,12 @@ function App() {
           break;
 
         case 'yaml':
-          const parsed = yaml.parse(message.yaml, {
-            prettyErrors: true,
-            strict: true,
-          });
-          liveCheckService.updateRelationships(parsed.relationships ?? '');
+          liveCheckService.updateRelationships(
+            yaml.parse(message.yaml, {
+              prettyErrors: true,
+              strict: true,
+            }).relationships ?? '',
+          );
           break;
 
         case 'activeFile':
@@ -62,11 +52,7 @@ function App() {
     liveCheckService.removeItem(liveCheckService.items[index]);
   };
 
-  const updateWatch = (
-    index: number,
-    field: keyof LiveCheckItem,
-    value: string
-  ) => {
+  const updateWatch = (index: number, field: keyof LiveCheckItem, value: string) => {
     const item = liveCheckService.items[index];
     switch (field) {
       case 'object':
@@ -89,19 +75,14 @@ function App() {
     liveCheckService.itemUpdated(item);
   };
 
-  const isValidFile =
-    !!activeFilePath &&
-    (activeFilePath.endsWith('.zed') || activeFilePath.endsWith('.zed.yaml'));
+  const isValidFile = !!activeFilePath && (activeFilePath.endsWith('.zed') || activeFilePath.endsWith('.zed.yaml'));
 
   return (
     <VSCodePanelView>
       {devService.state.status !== 'ready' && <VSCodeProgressRing />}
       {devService.state.status === 'ready' && !isValidFile && (
         <div>
-          <div>
-            The current editor is not viewing a SpiceDB schema or relationships
-            file
-          </div>
+          <div>The current editor is not viewing a SpiceDB schema or relationships file</div>
         </div>
       )}
       {devService.state.status === 'ready' && isValidFile && (
@@ -122,9 +103,7 @@ function App() {
                     item={item}
                     key={index}
                     onRemoveWatch={() => removeWatch(index)}
-                    onChange={(field, value) =>
-                      updateWatch(index, field, value)
-                    }
+                    onChange={(field, value) => updateWatch(index, field, value)}
                   />
                 );
               })}
@@ -132,9 +111,7 @@ function App() {
           )}
           {liveCheckService.items.length === 0 && (
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <VSCodeButton onClick={() => liveCheckService.addItem()}>
-                Add Watch
-              </VSCodeButton>
+              <VSCodeButton onClick={() => liveCheckService.addItem()}>Add Watch</VSCodeButton>
             </div>
           )}
         </div>
@@ -211,9 +188,7 @@ function WatchRow(props: {
 function StatusIcon(props: { item: LiveCheckItem }) {
   // Icon reference: https://code.visualstudio.com/api/references/icons-in-labels
   if (props.item.errorMessage) {
-    return (
-      <i className="codicon codicon-alert" style={{ color: 'yellow' }}></i>
-    );
+    return <i className="codicon codicon-alert" style={{ color: 'yellow' }}></i>;
   }
 
   switch (props.item.status) {
@@ -224,33 +199,16 @@ function StatusIcon(props: { item: LiveCheckItem }) {
       return <i className="codicon codicon-stop" style={{ color: 'red' }}></i>;
 
     case LiveCheckItemStatus.FOUND:
-      return (
-        <i
-          className="codicon codicon-verified-filled"
-          style={{ color: 'green' }}
-        ></i>
-      );
+      return <i className="codicon codicon-verified-filled" style={{ color: 'green' }}></i>;
 
     case LiveCheckItemStatus.INVALID:
-      return (
-        <i
-          className="codicon codicon-circle-slash"
-          style={{ color: 'orange' }}
-        ></i>
-      );
+      return <i className="codicon codicon-circle-slash" style={{ color: 'orange' }}></i>;
 
     case LiveCheckItemStatus.CAVEATED:
-      return (
-        <i className="codicon codicon-array" style={{ color: 'purple' }}></i>
-      );
+      return <i className="codicon codicon-array" style={{ color: 'purple' }}></i>;
 
     case LiveCheckItemStatus.NOT_VALID:
-      return (
-        <i
-          className="codicon codicon-circle-slash"
-          style={{ color: 'orange' }}
-        ></i>
-      );
+      return <i className="codicon codicon-circle-slash" style={{ color: 'orange' }}></i>;
 
     default:
       return <i className="codicon codicon-debug-step-over"></i>;

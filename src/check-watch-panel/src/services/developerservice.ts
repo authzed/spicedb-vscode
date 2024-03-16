@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+
 import { parseRelationships } from './parsing';
 import { RelationTuple as Relationship } from './protodevdefs/core/v1/core';
 import {
@@ -33,10 +34,7 @@ export interface DeveloperService {
    * newRequest creates and returns a new request to the developer service, with the given schema
    * and relationships (as a newline separated string) as test data.
    */
-  newRequest: (
-    schema: string,
-    relationshipsString: string
-  ) => DeveloperServiceRequest | undefined;
+  newRequest: (schema: string, relationshipsString: string) => DeveloperServiceRequest | undefined;
 }
 
 /**
@@ -100,7 +98,10 @@ class DeveloperServiceRequest {
   private relationships: Relationship[] = [];
   private operations: OperationAndCallback[] = [];
 
-  constructor(private schema: string, relationshipsString: string) {
+  constructor(
+    private schema: string,
+    relationshipsString: string,
+  ) {
     this.relationships = parseRelationships(relationshipsString);
   }
 
@@ -122,10 +123,7 @@ class DeveloperServiceRequest {
   /**
    * check adds a check request operation to be executed.
    */
-  public check(
-    parameters: CheckOperationParameters,
-    callback: DevServiceCallback<CheckOperationsResult>
-  ) {
+  public check(parameters: CheckOperationParameters, callback: DevServiceCallback<CheckOperationsResult>) {
     this.operations.push({
       operation: 'check',
       parameters: {
@@ -140,10 +138,7 @@ class DeveloperServiceRequest {
   /**
    * runAssertions adds a run assertions operation to be executed.
    */
-  public runAssertions(
-    yaml: string,
-    callback: DevServiceCallback<RunAssertionsResult>
-  ) {
+  public runAssertions(yaml: string, callback: DevServiceCallback<RunAssertionsResult>) {
     this.operations.push({
       operation: 'runAssertions',
       parameters: {
@@ -160,10 +155,7 @@ class DeveloperServiceRequest {
   /**
    * runValidation adds a run validation operation to be executed.
    */
-  public runValidation(
-    yaml: string,
-    callback: DevServiceCallback<RunValidationResult>
-  ) {
+  public runValidation(yaml: string, callback: DevServiceCallback<RunValidationResult>) {
     this.operations.push({
       operation: 'runValidation',
       parameters: {
@@ -186,16 +178,12 @@ class DeveloperServiceRequest {
         schema: this.schema,
         relationships: this.relationships,
       },
-      operations: this.operations.map(
-        (opc: OperationAndCallback): Operation => {
-          return opc.parameters;
-        }
-      ),
+      operations: this.operations.map((opc: OperationAndCallback): Operation => {
+        return opc.parameters;
+      }),
     };
 
-    const encodedResponse: string = (window as any)[ENTRYPOINT_FUNCTION](
-      DeveloperRequest.toJsonString(request)
-    );
+    const encodedResponse: string = (window as any)[ENTRYPOINT_FUNCTION](DeveloperRequest.toJsonString(request));
 
     const response = DeveloperResponse.fromJsonString(encodedResponse, {
       ignoreUnknownFields: true,
@@ -240,9 +228,7 @@ export function useDeveloperService(): DeveloperService {
 
     // Fetch the WASM file with progress tracking.
     const fetched = await fetch((global as any).WASM_BUNDLE_URI);
-    const contentLength = +(
-      fetched.headers.get('Content-Length') ?? ESTIMATED_WASM_BINARY_SIZE
-    );
+    const contentLength = +(fetched.headers.get('Content-Length') ?? ESTIMATED_WASM_BINARY_SIZE);
 
     const reader = fetched.body?.getReader();
     if (!reader) {
@@ -272,10 +258,7 @@ export function useDeveloperService(): DeveloperService {
     const refetched = await fetch((global as any).WASM_BUNDLE_URI);
 
     try {
-      const result = await WebAssembly.instantiateStreaming(
-        refetched,
-        go.importObject
-      );
+      const result = await WebAssembly.instantiateStreaming(refetched, go.importObject);
       go.run(result.instance);
       setState({
         status: 'ready',

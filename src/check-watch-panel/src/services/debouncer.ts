@@ -17,10 +17,7 @@ interface CheckerState<T> {
  * useDebouncedChecker is a hook for invoking a specific checker function after the given
  * rate of seconds, and automatically handling debouncing and rechecking.
  */
-export function useDebouncedChecker<T>(
-  rate: number,
-  checker: (arg: T) => Promise<void>
-) {
+export function useDebouncedChecker<T>(rate: number, checker: (arg: T) => Promise<void>) {
   const state = useRef<CheckerState<T>>({
     status: CheckerStatus.SLEEPING,
     runIndex: -1,

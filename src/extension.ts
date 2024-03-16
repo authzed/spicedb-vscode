@@ -1,10 +1,6 @@
 import * as vscode from 'vscode';
-import {
-  LanguageClient,
-  LanguageClientOptions,
-  ServerOptions,
-  TransportKind,
-} from 'vscode-languageclient/node';
+import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient/node';
+
 import { CheckWatchProvider } from './checkwatchprovider';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -12,17 +8,12 @@ export function activate(context: vscode.ExtensionContext) {
 
   const checkWatchProvider = new CheckWatchProvider(context.extensionUri);
 
-  context.subscriptions.push(
-    vscode.window.registerWebviewViewProvider(
-      CheckWatchProvider.viewType,
-      checkWatchProvider
-    )
-  );
+  context.subscriptions.push(vscode.window.registerWebviewViewProvider(CheckWatchProvider.viewType, checkWatchProvider));
 
   context.subscriptions.push(
     vscode.commands.registerCommand('spicedb.addCheckWatch', () => {
       checkWatchProvider.addWatch();
-    })
+    }),
   );
 
   context.subscriptions.push(
@@ -30,31 +21,23 @@ export function activate(context: vscode.ExtensionContext) {
       if (editor) {
         checkWatchProvider.performUpdate(editor.document.uri.fsPath);
       }
-    })
+    }),
   );
 
   context.subscriptions.push(
-    vscode.workspace.onDidChangeTextDocument(
-      (e: vscode.TextDocumentChangeEvent) => {
-        if (e.document.uri.fsPath.endsWith('.zed')) {
-          if (
-            vscode.window.activeTextEditor?.document.uri.fsPath ===
-            e.document.uri.fsPath
-          ) {
-            checkWatchProvider.setActiveSchema(e.document.getText());
-          }
-        }
-
-        if (e.document.uri.fsPath.endsWith('.zed.yaml')) {
-          if (
-            vscode.window.activeTextEditor?.document.uri.fsPath ===
-            e.document.uri.fsPath
-          ) {
-            checkWatchProvider.setActiveYaml(e.document.getText());
-          }
+    vscode.workspace.onDidChangeTextDocument((e: vscode.TextDocumentChangeEvent) => {
+      if (e.document.uri.fsPath.endsWith('.zed')) {
+        if (vscode.window.activeTextEditor?.document.uri.fsPath === e.document.uri.fsPath) {
+          checkWatchProvider.setActiveSchema(e.document.getText());
         }
       }
-    )
+
+      if (e.document.uri.fsPath.endsWith('.zed.yaml')) {
+        if (vscode.window.activeTextEditor?.document.uri.fsPath === e.document.uri.fsPath) {
+          checkWatchProvider.setActiveYaml(e.document.getText());
+        }
+      }
+    }),
   );
 
   startLanguageServer();
@@ -85,12 +68,7 @@ async function startLanguageServer() {
   };
 
   // Create the language client and start the client.
-  const client = new LanguageClient(
-    'spicedbLanguageServer',
-    'SpiceDB Language Server',
-    serverOptions,
-    clientOptions
-  );
+  const client = new LanguageClient('spicedbLanguageServer', 'SpiceDB Language Server', serverOptions, clientOptions);
 
   // Start the client. This will also launch the server.
   await client.start();

@@ -1,26 +1,16 @@
 {
-	"version": "0.1",
-	"name": "SpiceDB Schema",
-	"scopeName": "source.spicedb",
+  "version": "0.1",
+  "name": "SpiceDB Schema",
+  "scopeName": "source.spicedb",
   "foldingStartMarker": "\\{\\s*$",
   "foldingStopMarker": "^\\s*\\}",
-	"patterns": [
-    { "include": "#comment" },
-    { "include": "#definition" },
-    { "include": "#caveat" }
-  ],
+  "patterns": [{ "include": "#comment" }, { "include": "#definition" }, { "include": "#caveat" }],
   "repository": {
     "comment": {
-      "patterns": [
-        { "include": "#lineComment" },
-        { "include": "#blockComment" }
-      ],
+      "patterns": [{ "include": "#lineComment" }, { "include": "#blockComment" }],
       "repository": {
         "lineComment": {
-          "patterns": [
-            { "include": "#doubleSlashLineComment" },
-            { "include": "#slashDotLineComment" }
-          ],
+          "patterns": [{ "include": "#doubleSlashLineComment" }, { "include": "#slashDotLineComment" }],
           "repository": {
             "doubleSlashLineComment": {
               "match": "\\/\\/.*",
@@ -41,29 +31,25 @@
     },
     "definition": {
       "comment": "definition of a resource type in schema",
-			"begin": "(\\bdefinition\\b)\\s+([a-zA-Z_]\\w*)\\s*(\\{)",
-			"beginCaptures": {
-				"1": {
-					"name": "keyword.class.definition"
-				},
-				"2": {
-					"name": "entity.name.class"
-				},
+      "begin": "(\\bdefinition\\b)\\s+([a-zA-Z_]\\w*)\\s*(\\{)",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.class.definition"
+        },
+        "2": {
+          "name": "entity.name.class"
+        },
         "3": {
           "name": "punctuation.definition.brace"
         }
-  		},
+      },
       "end": "(?<=\\})",
       "endCaptures": {
-				"0": {
-					"name": "punctuation.end.brace"
-				}
-			},
-      "patterns": [
-        { "include": "#relation" },
-        { "include": "#permission" },
-        { "include": "#comment" }
-      ]
+        "0": {
+          "name": "punctuation.end.brace"
+        }
+      },
+      "patterns": [{ "include": "#relation" }, { "include": "#permission" }, { "include": "#comment" }]
     },
     "relation": {
       "comment": "definition of a relation",
@@ -200,34 +186,28 @@
     "caveat": {
       "comment": "caveat in schema",
       "name": "meta.embedded.block.cel",
-			"begin": "(\\bcaveat\\b)\\s+([a-zA-Z_]\\w*)\\s*\\(([^\\)]*)\\)\\s*(\\{)",
-			"beginCaptures": {
-				"1": {
-					"name": "keyword.function.definition"
-				},
-				"2": {
-					"name": "entity.name.function"
-				},
-				"3": {
-					"patterns": [
-            { "include": "#caveatParameter" },
-            { "include": "#caveatTypeName" },
-            { "include": "#comma" }
-          ]
-				},
+      "begin": "(\\bcaveat\\b)\\s+([a-zA-Z_]\\w*)\\s*\\(([^\\)]*)\\)\\s*(\\{)",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.function.definition"
+        },
+        "2": {
+          "name": "entity.name.function"
+        },
+        "3": {
+          "patterns": [{ "include": "#caveatParameter" }, { "include": "#caveatTypeName" }, { "include": "#comma" }]
+        },
         "4": {
           "name": "punctuation.definition.brace"
         }
-  		},
+      },
       "end": "(?<=\\})$",
       "endCaptures": {
-				"0": {
-					"name": "punctuation.end.brace"
-				}
-			},
-      "patterns": [
-        { "include": "source.cel" }
-      ]
+        "0": {
+          "name": "punctuation.end.brace"
+        }
+      },
+      "patterns": [{ "include": "source.cel" }]
     },
     "caveatTypeName": {
       "comment": "caveat type name",

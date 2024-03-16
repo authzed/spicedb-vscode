@@ -1,14 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+
 import { v4 as uuidv4 } from 'uuid';
+
 import { useDebouncedChecker } from './debouncer';
 import { DeveloperService, DeveloperServiceError } from './developerservice';
 import { parseRelationship } from './parsing';
 import { DebugInformation } from './protodevdefs/authzed/api/v1/debug';
-import {
-  CheckOperationsResult_Membership,
-  DeveloperError,
-  DeveloperResponse,
-} from './protodevdefs/developer/v1/developer';
+import { CheckOperationsResult_Membership, DeveloperError, DeveloperResponse } from './protodevdefs/developer/v1/developer';
 
 export enum LiveCheckStatus {
   PARSE_ERROR = -2,
@@ -72,16 +70,13 @@ async function runEditCheckWasm(
   developerService: DeveloperService,
   schemaString: string,
   relationshipsString: string,
-  items: LiveCheckItem[]
+  items: LiveCheckItem[],
 ): Promise<DeveloperResponse | undefined> {
   if (!schemaString || !relationshipsString) {
     return;
   }
 
-  const request = developerService.newRequest(
-    schemaString,
-    relationshipsString
-  );
+  const request = developerService.newRequest(schemaString, relationshipsString);
   if (request === undefined) {
     return;
   }
@@ -110,10 +105,7 @@ async function runEditCheckWasm(
           return;
         }
 
-        if (
-          result.partialCaveatInfo?.missingRequiredContext &&
-          result.partialCaveatInfo?.missingRequiredContext.length > 0
-        ) {
+        if (result.partialCaveatInfo?.missingRequiredContext && result.partialCaveatInfo?.missingRequiredContext.length > 0) {
           item.status = LiveCheckItemStatus.CAVEATED;
           item.debugInformation = result.resolvedDebugInformation;
           item.errorMessage = undefined;
@@ -122,11 +114,9 @@ async function runEditCheckWasm(
 
         item.debugInformation = result.resolvedDebugInformation;
         item.status =
-          result.membership === CheckOperationsResult_Membership.MEMBER
-            ? LiveCheckItemStatus.FOUND
-            : LiveCheckItemStatus.NOT_FOUND;
+          result.membership === CheckOperationsResult_Membership.MEMBER ? LiveCheckItemStatus.FOUND : LiveCheckItemStatus.NOT_FOUND;
         item.errorMessage = undefined;
-      }
+      },
     );
   });
 
@@ -137,9 +127,7 @@ async function runEditCheckWasm(
  * useLiveCheckService is a hook which manages the definitions of live checking,
  * including live parsing and check watches.
  */
-export function useLiveCheckService(
-  developerService: DeveloperService
-): LiveCheckService {
+export function useLiveCheckService(developerService: DeveloperService): LiveCheckService {
   const [items, setItems] = useState<LiveCheckItem[]>([]);
   const [state, setState] = useState<LiveCheckRunState>({
     status: LiveCheckStatus.NEVER_RUN,
@@ -156,12 +144,7 @@ export function useLiveCheckService(
       }
 
       setState({ status: LiveCheckStatus.CHECKING });
-      const response = await runEditCheckWasm(
-        developerService,
-        schemaRef.current,
-        relationshipsRef.current,
-        itemsToCheck
-      );
+      const response = await runEditCheckWasm(developerService, schemaRef.current, relationshipsRef.current, itemsToCheck);
       if (response === undefined) {
         setState({ status: LiveCheckStatus.NOT_CHECKING });
 
@@ -170,22 +153,19 @@ export function useLiveCheckService(
             status: LiveCheckStatus.SERVICE_ERROR,
             lastRun: new Date(),
             requestErrors: [],
-            serverErr:
-              'Cannot instantiate developer service. Please make sure you have WebAssembly enabled.',
+            serverErr: 'Cannot instantiate developer service. Please make sure you have WebAssembly enabled.',
           });
         }
         return;
       }
 
       const serverErr: string | undefined = response.internalError || undefined;
-      const devErrs: DeveloperError[] = response.developerErrors
-        ? response.developerErrors.inputErrors
-        : [];
+      const devErrs: DeveloperError[] = response.developerErrors ? response.developerErrors.inputErrors : [];
       const status = serverErr
         ? LiveCheckStatus.SERVICE_ERROR
         : devErrs.length > 0
-        ? LiveCheckStatus.PARSE_ERROR
-        : LiveCheckStatus.NOT_CHECKING;
+          ? LiveCheckStatus.PARSE_ERROR
+          : LiveCheckStatus.NOT_CHECKING;
 
       setState({
         status: status,
@@ -194,17 +174,14 @@ export function useLiveCheckService(
         serverErr: serverErr,
       });
     },
-    [developerService, devServiceStatus]
+    [developerService, devServiceStatus],
   );
 
   const { run: check } = useDebouncedChecker(500, runCheck);
 
   // Setup an effect which runs the check initially once the developer service is ready.
   useEffect(() => {
-    if (
-      state.status === LiveCheckStatus.NEVER_RUN &&
-      devServiceStatus === 'ready'
-    ) {
+    if (state.status === LiveCheckStatus.NEVER_RUN && devServiceStatus === 'ready') {
       check(items);
     }
   }, [state, items, check, devServiceStatus]);
