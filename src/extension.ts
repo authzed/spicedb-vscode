@@ -67,7 +67,7 @@ export function activate(context: vscode.ExtensionContext) {
 
       const resolution = new Resolver(parserResult.schema!);
       switch (found.node?.kind) {
-        case 'typeref':
+        case 'typeref': {
           const def = resolution.lookupDefinition(found.node.path);
           if (def) {
             if (found.node.relationName) {
@@ -98,8 +98,9 @@ export function activate(context: vscode.ExtensionContext) {
             }
           }
           break;
+        }
 
-        case 'relationref':
+        case 'relationref': {
           const relation = resolution.resolveRelationOrPermission(
             found.node,
             found.def
@@ -116,6 +117,7 @@ export function activate(context: vscode.ExtensionContext) {
             };
           }
           break;
+        }
       }
 
       return undefined;
