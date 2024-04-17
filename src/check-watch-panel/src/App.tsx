@@ -19,7 +19,7 @@ function App() {
   const liveCheckService = useLiveCheckService(devService);
 
   useEffect(() => {
-    const listener = (event: MessageEvent<any>) => {
+    const listener = (event) => {
       const message = event.data;
       switch (message.type) {
         case 'addWatch':
