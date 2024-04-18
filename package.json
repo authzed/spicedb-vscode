@@ -1,0 +1,112 @@
+{
+  "name": "spicedb-vscode",
+  "displayName": "SpiceDB VSCode",
+  "description": "VSCode Extension for working with SpiceDB",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.87.0"
+  },
+  "extensionKind": [
+    "ui",
+    "workspace"
+  ],
+  "categories": [
+    "Other"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "spicedb",
+        "aliases": [
+          "SpiceDB",
+          "spicedb",
+          "Authzed",
+          "authzed"
+        ],
+        "extensions": [
+          ".zed"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./icons/authzed.svg",
+          "dark": "./icons/authzed.svg"
+        }
+      }
+    ],
+    "grammars": [
+      {
+        "language": "spicedb",
+        "scopeName": "source.spicedb",
+        "path": "./syntaxes/spicedb.tmGrammar.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.cel": "cel"
+        }
+      }
+    ],
+    "viewsContainers": {
+      "panel": [
+        {
+          "id": "check-watches",
+          "title": "Check Watches",
+          "icon": "./icons/authzed.svg"
+        }
+      ]
+    },
+    "views": {
+      "check-watches": [
+        {
+          "type": "webview",
+          "id": "spicedb.checkWatchView",
+          "name": "Check Watches"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "spicedb.addCheckWatch",
+        "category": "Check Watches",
+        "title": "Add Check Watch",
+        "icon": "$(watch-expressions-add)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "spicedb.addCheckWatch",
+          "group": "navigation",
+          "when": "view == spicedb.checkWatchView"
+        }
+      ]
+    }
+  },
+  "extensionDependencies": [
+    "hmarr.cel"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "scripts": {
+    "vscode:prepublish": "yarn run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "yarn run compile && yarn run lint",
+    "lint": "eslint --ext .js,.ts && prettier -c .",
+    "lint:fix": "eslint --fix --ext .js,.ts && prettier -w .",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "18.x",
+    "@types/vscode": "^1.87.0",
+    "@typescript-eslint/eslint-plugin": "^7.2.0",
+    "@typescript-eslint/parser": "^7.2.0",
+    "@vscode/test-cli": "^0.0.6",
+    "@vscode/test-electron": "^2.3.9",
+    "eslint": "^8.56.0",
+    "prettier": "^3.2.5",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  }
+}
