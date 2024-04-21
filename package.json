@@ -107,6 +107,10 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@types/command-exists": "^1.2.3",
+    "@types/parsimmon": "^1.10.9",
+    "command-exists": "^1.2.9",
+    "parsimmon": "^1.18.1",
     "vscode-languageclient": "^9.0.1"
   }
 }

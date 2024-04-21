@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient/node';
 
+import { getInstallCommand, languageServerBinaryPath } from './binary';
 import { CheckWatchProvider } from './checkwatchprovider';
 import { findReferenceNode, parse } from './parsers/dsl/dsl';
 import { ResolvedReference, Resolver } from './parsers/dsl/resolution';
@@ -47,7 +48,7 @@ export function activate(context: vscode.ExtensionContext) {
     provideDefinition: function (
       document: vscode.TextDocument,
       position: vscode.Position,
-      token: vscode.CancellationToken
+      token: vscode.CancellationToken,
     ): vscode.ProviderResult<vscode.Definition> {
       const text = document.getText();
       const parserResult = parse(text);
@@ -56,11 +57,7 @@ export function activate(context: vscode.ExtensionContext) {
       }
 
       // NOTE: the indexes from VSCode are 0-based, but the parser is 1-based.
-      const found = findReferenceNode(
-        parserResult.schema!,
-        position.line + 1,
-        position.character + 1
-      );
+      const found = findReferenceNode(parserResult.schema!, position.line + 1, position.character + 1);
       if (!found) {
         return;
       }
@@ -71,9 +68,7 @@ export function activate(context: vscode.ExtensionContext) {
           const def = resolution.lookupDefinition(found.node.path);
           if (def) {
             if (found.node.relationName) {
-              const relation = def.lookupRelationOrPermission(
-                found.node.relationName
-              );
+              const relation = def.lookupRelationOrPermission(found.node.relationName);
               if (relation) {
                 return {
                   uri: document.uri,
@@ -81,7 +76,7 @@ export function activate(context: vscode.ExtensionContext) {
                     relation.range.startIndex.line - 1,
                     relation.range.startIndex.column - 1,
                     relation.range.startIndex.line - 1,
-                    relation.range.startIndex.column - 1
+                    relation.range.startIndex.column - 1,
                   ),
                 };
               }
@@ -92,7 +87,7 @@ export function activate(context: vscode.ExtensionContext) {
                   def.definition.range.startIndex.line - 1,
                   def.definition.range.startIndex.column - 1,
                   def.definition.range.startIndex.line - 1,
-                  def.definition.range.startIndex.column - 1
+                  def.definition.range.startIndex.column - 1,
                 ),
               };
             }
@@ -101,10 +96,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         case 'relationref': {
-          const relation = resolution.resolveRelationOrPermission(
-            found.node,
-            found.def
-          );
+          const relation = resolution.resolveRelationOrPermission(found.node, found.def);
           if (relation) {
             return {
               uri: document.uri,
@@ -112,7 +104,7 @@ export function activate(context: vscode.ExtensionContext) {
                 relation.range.startIndex.line - 1,
                 relation.range.startIndex.column - 1,
                 relation.range.startIndex.line - 1,
-                relation.range.startIndex.column - 1
+                relation.range.startIndex.column - 1,
               ),
             };
           }
@@ -130,7 +122,7 @@ export function activate(context: vscode.ExtensionContext) {
     {
       provideDocumentSemanticTokens: function (
         document: vscode.TextDocument,
-        token: vscode.CancellationToken
+        token: vscode.CancellationToken,
       ): vscode.ProviderResult<vscode.SemanticTokens> {
         const text = document.getText();
         const parserResult = parse(text);
@@ -151,19 +143,13 @@ export function activate(context: vscode.ExtensionContext) {
         let prevLine = 0;
         let prevChar = 0;
 
-        const appendData = (
-          lineNumber: number,
-          colPosition: number,
-          length: number,
-          tokenType: number,
-          modifierIndex: number
-        ) => {
+        const appendData = (lineNumber: number, colPosition: number, length: number, tokenType: number, modifierIndex: number) => {
           data.push(
             lineNumber - prevLine,
             prevLine === lineNumber ? colPosition - prevChar : colPosition,
             length,
             tokenType,
-            modifierIndex
+            modifierIndex,
           );
 
           prevLine = lineNumber;
@@ -173,101 +159,65 @@ export function activate(context: vscode.ExtensionContext) {
         // Resolve all type references and relation/permission references in expressions and color based on their kind and resolution
         // status.
         const resolution = new Resolver(parserResult.schema!);
-        resolution
-          .resolvedReferences()
-          .forEach((resolved: ResolvedReference) => {
-            const lineNumber = resolved.reference.range.startIndex.line - 1; // parser ranges are 1-indexed
-            const colPosition = resolved.reference.range.startIndex.column - 1;
+        resolution.resolvedReferences().forEach((resolved: ResolvedReference) => {
+          const lineNumber = resolved.reference.range.startIndex.line - 1; // parser ranges are 1-indexed
+          const colPosition = resolved.reference.range.startIndex.column - 1;
 
-            switch (resolved.kind) {
-              case 'type':
-                if (resolved.referencedTypeAndRelation === undefined) {
+          switch (resolved.kind) {
+            case 'type':
+              if (resolved.referencedTypeAndRelation === undefined) {
+                appendData(lineNumber, colPosition, resolved.reference.path.length, /* type.unknown */ 3, 0);
+                return;
+              }
+
+              appendData(lineNumber, colPosition, resolved.reference.path.length, /* type */ 0, 0);
+
+              if (resolved.reference.relationName) {
+                if (resolved.referencedTypeAndRelation.relation !== undefined) {
                   appendData(
                     lineNumber,
-                    colPosition,
-                    resolved.reference.path.length,
-                    /* type.unknown */ 3,
-                    0
-                  );
-                  return;
-                }
-
-                appendData(
-                  lineNumber,
-                  colPosition,
-                  resolved.reference.path.length,
-                  /* type */ 0,
-                  0
-                );
-
-                if (resolved.reference.relationName) {
-                  if (
-                    resolved.referencedTypeAndRelation.relation !== undefined
-                  ) {
-                    appendData(
-                      lineNumber,
-                      colPosition + 1 + resolved.reference.path.length,
-                      resolved.reference.relationName.length,
-                      /* member */ 2,
-                      0
-                    );
-                  } else if (
-                    resolved.referencedTypeAndRelation.permission !== undefined
-                  ) {
-                    appendData(
-                      lineNumber,
-                      colPosition + 1 + resolved.reference.path.length,
-                      resolved.reference.relationName.length,
-                      /* property */ 1,
-                      0
-                    );
-                  } else {
-                    appendData(
-                      lineNumber,
-                      colPosition + 1 + resolved.reference.path.length,
-                      resolved.reference.relationName.length,
-                      /* member.unknown */ 3,
-                      0
-                    );
-                  }
-                }
-                break;
-
-              case 'expression':
-                if (resolved.resolvedRelationOrPermission === undefined) {
-                  appendData(
-                    lineNumber,
-                    colPosition,
+                    colPosition + 1 + resolved.reference.path.length,
                     resolved.reference.relationName.length,
-                    /* property.unknown */ 5,
-                    0
+                    /* member */ 2,
+                    0,
+                  );
+                } else if (resolved.referencedTypeAndRelation.permission !== undefined) {
+                  appendData(
+                    lineNumber,
+                    colPosition + 1 + resolved.reference.path.length,
+                    resolved.reference.relationName.length,
+                    /* property */ 1,
+                    0,
                   );
                 } else {
-                  switch (resolved.resolvedRelationOrPermission.kind) {
-                    case 'permission':
-                      appendData(
-                        lineNumber,
-                        colPosition,
-                        resolved.reference.relationName.length,
-                        /* member */ 2,
-                        0
-                      );
-                      break;
-
-                    case 'relation':
-                      appendData(
-                        lineNumber,
-                        colPosition,
-                        resolved.reference.relationName.length,
-                        /* property */ 1,
-                        0
-                      );
-                      break;
-                  }
+                  appendData(
+                    lineNumber,
+                    colPosition + 1 + resolved.reference.path.length,
+                    resolved.reference.relationName.length,
+                    /* member.unknown */ 3,
+                    0,
+                  );
                 }
-                break;
-            }
-          });
+              }
+              break;
+
+            case 'expression':
+              if (resolved.resolvedRelationOrPermission === undefined) {
+                appendData(lineNumber, colPosition, resolved.reference.relationName.length, /* property.unknown */ 5, 0);
+              } else {
+                switch (resolved.resolvedRelationOrPermission.kind) {
+                  case 'permission':
+                    appendData(lineNumber, colPosition, resolved.reference.relationName.length, /* member */ 2, 0);
+                    break;
+
+                  case 'relation':
+                    appendData(lineNumber, colPosition, resolved.reference.relationName.length, /* property */ 1, 0);
+                    break;
+                }
+              }
+              break;
+          }
+        });
 
         return {
           data: new Uint32Array(data),
@@ -276,24 +226,35 @@ export function activate(context: vscode.ExtensionContext) {
       },
     },
     {
-      tokenTypes: [
-        'type',
-        'property',
-        'member',
-        'type.unknown',
-        'member.unknown',
-        'property.unknown',
-      ],
+      tokenTypes: ['type', 'property', 'member', 'type.unknown', 'member.unknown', 'property.unknown'],
       tokenModifiers: ['declaration'],
-    }
+    },
   );
 
-  startLanguageServer();
+  startLanguageServer(context);
 }
 
-async function startLanguageServer() {
+async function startLanguageServer(context: vscode.ExtensionContext) {
   // Start the LSP hooks using the language server found in the SpiceDB binary.
-  const serverBinary = 'spicedb';
+  const serverBinary = await languageServerBinaryPath(context);
+  if (!serverBinary) {
+    const installCommand = getInstallCommand();
+    if (installCommand.startsWith('https://')) {
+      const OpenInstall = 'Open Installation Instructions';
+      vscode.window
+        .showInformationMessage('`spicedb` binary is not installed. Click below to open the installation instructions.', OpenInstall)
+        .then((selection) => {
+          if (selection === OpenInstall) {
+            vscode.env.openExternal(vscode.Uri.parse(installCommand));
+          }
+        });
+    } else {
+      vscode.window.showErrorMessage('`spicedb` binary is not installed. Please install it using `' + installCommand + '`');
+    }
+
+    console.error('Failed to find the SpiceDB language server binary');
+    return;
+  }
 
   const serverOptions: ServerOptions = {
     run: {
