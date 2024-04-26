@@ -4,7 +4,13 @@
   "scopeName": "source.spicedb",
   "foldingStartMarker": "\\{\\s*$",
   "foldingStopMarker": "^\\s*\\}",
-  "patterns": [{ "include": "#comment" }, { "include": "#definition" }, { "include": "#caveat" }, { "include": "#relation" }, { "include": "#permission" }],
+  "patterns": [
+    { "include": "#comment" },
+    { "include": "#definition" },
+    { "include": "#caveat" },
+    { "include": "#relation" },
+    { "include": "#permission" }
+  ],
   "repository": {
     "comment": {
       "patterns": [{ "include": "#lineComment" }, { "include": "#blockComment" }],

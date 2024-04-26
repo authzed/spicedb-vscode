@@ -1,4 +1,5 @@
 import Parsimmon from 'parsimmon';
+
 import { celExpression } from '../cel/cel';
 
 /**
@@ -52,9 +53,7 @@ export const parseSchema = (value: string): ParsedSchema | undefined => {
 /**
  * ObjectOrCaveatDefinition are the types of definitions found at the root of a schema.
  */
-export type ObjectOrCaveatDefinition =
-  | ParsedObjectDefinition
-  | ParsedCaveatDefinition;
+export type ObjectOrCaveatDefinition = ParsedObjectDefinition | ParsedCaveatDefinition;
 
 /**
  * parse performs a parse on the schema string, returning the full parse result.
@@ -73,8 +72,7 @@ export function parse(input: string): ParseResult {
       ? {
           kind: 'schema',
           stringValue: input,
-          definitions: (result as Parsimmon.Success<ObjectOrCaveatDefinition[]>)
-            .value,
+          definitions: (result as Parsimmon.Success<ObjectOrCaveatDefinition[]>).value,
         }
       : undefined,
   };
@@ -84,23 +82,14 @@ export function parse(input: string): ParseResult {
  * getCaveatExpression returns the string form of the caveat expression for a particular parsed
  * caveat expression within a schema.
  */
-export function getCaveatExpression(
-  expr: ParsedCaveatExpression,
-  parsed: ParsedSchema
-): string {
-  return parsed.stringValue.substring(
-    expr.range.startIndex.offset,
-    expr.range.endIndex.offset
-  );
+export function getCaveatExpression(expr: ParsedCaveatExpression, parsed: ParsedSchema): string {
+  return parsed.stringValue.substring(expr.range.startIndex.offset, expr.range.endIndex.offset);
 }
 
 /**
  * flatMapExpression runs a flat mapping operation over an expression tree, returning any found results.
  */
-export function flatMapExpression<T>(
-  expr: ParsedExpression,
-  walker: ExprWalker<T>
-): T[] {
+export function flatMapExpression<T>(expr: ParsedExpression, walker: ExprWalker<T>): T[] {
   switch (expr.kind) {
     case 'arrow':
       const arrowResult = walker(expr);
@@ -119,9 +108,7 @@ export function flatMapExpression<T>(
       const binResult = walker(expr);
       const leftResults = flatMapExpression<T>(expr.left, walker);
       const rightResults = flatMapExpression<T>(expr.right, walker);
-      return binResult
-        ? [...leftResults, ...rightResults, binResult]
-        : [...leftResults, ...rightResults];
+      return binResult ? [...leftResults, ...rightResults, binResult] : [...leftResults, ...rightResults];
   }
 }
 
@@ -138,11 +125,7 @@ export interface ReferenceNode {
  * findReferenceNode walks the parse tree to find the node matching the given line number and
  * column position.
  */
-export function findReferenceNode(
-  schema: ParsedSchema,
-  lineNumber: number,
-  columnPosition: number
-): ReferenceNode | undefined {
+export function findReferenceNode(schema: ParsedSchema, lineNumber: number, columnPosition: number): ReferenceNode | undefined {
   const found = schema.definitions
     .map((def: ObjectOrCaveatDefinition) => {
       if (!rangeContains(def, lineNumber, columnPosition)) {
@@ -162,10 +145,7 @@ export function findReferenceNode(
  * mapParsedSchema runs the given mapper function on every node in the parse tree (except the
  * contents of a caveat, which are considered "opaque").
  */
-export function mapParsedSchema(
-  schema: ParsedSchema | undefined,
-  mapper: (node: ParsedNode) => void
-) {
+export function mapParsedSchema(schema: ParsedSchema | undefined, mapper: (node: ParsedNode) => void) {
   if (schema === undefined) {
     return;
   }
@@ -227,11 +207,7 @@ export interface ParsedRelation {
   range: TextRange;
 }
 
-export type ParsedExpression =
-  | ParsedBinaryExpression
-  | ParsedRelationRefExpression
-  | ParsedArrowExpression
-  | ParsedNilExpression;
+export type ParsedExpression = ParsedBinaryExpression | ParsedRelationRefExpression | ParsedArrowExpression | ParsedNilExpression;
 
 export interface ParsedArrowExpression {
   kind: 'arrow';
@@ -329,9 +305,7 @@ const optWhitespace = Parsimmon.optWhitespace;
 const newline = Parsimmon.newline;
 
 const singleLineComment = regex(/\/\/.*/).then(optWhitespace.atMost(1));
-const multiLineComment = regex(/\/\*((((?!\*\/).)|\r|\n)*)\*\//).then(
-  optWhitespace.atMost(1)
-);
+const multiLineComment = regex(/\/\*((((?!\*\/).)|\r|\n)*)\*\//).then(optWhitespace.atMost(1));
 
 const comment = singleLineComment.or(multiLineComment);
 const whitespace = optWhitespace.then(comment.atLeast(0));
@@ -340,9 +314,7 @@ const lexeme = function (p: any) {
 };
 
 const identifier = lexeme(regex(/[a-zA-Z_][0-9a-zA-Z_+]*/));
-const path = lexeme(
-  regex(/([a-zA-Z_][0-9a-zA-Z_+-]*\/)*[a-zA-Z_][0-9a-zA-Z_+-]*/)
-);
+const path = lexeme(regex(/([a-zA-Z_][0-9a-zA-Z_+-]*\/)*[a-zA-Z_][0-9a-zA-Z_+-]*/));
 const colon = lexeme(regex(/:/));
 const equal = lexeme(regex(/=/));
 const semicolon = lexeme(regex(/;/));
@@ -371,17 +343,12 @@ const withCaveat: any = Parsimmon.seqMap(
       path: data[1],
       range: { startIndex: startIndex, endIndex: endIndex },
     };
-  }
+  },
 );
 
 const typeRef: any = Parsimmon.seqMap(
   Parsimmon.index,
-  seq(
-    seq(path, colon, lexeme(string('*'))).or(
-      seq(path, hash.then(identifier).atMost(1))
-    ),
-    withCaveat.atMost(1)
-  ),
+  seq(seq(path, colon, lexeme(string('*'))).or(seq(path, hash.then(identifier).atMost(1))), withCaveat.atMost(1)),
   Parsimmon.index,
   function (startIndex, data, endIndex) {
     const isWildcard = data[0][2] === '*';
@@ -393,23 +360,18 @@ const typeRef: any = Parsimmon.seqMap(
       withCaveat: (data[1] as any[]).length > 0 ? data[1][0] : undefined,
       range: { startIndex: startIndex, endIndex: endIndex },
     };
-  }
+  },
 );
 
 const typeExpr: any = Parsimmon.lazy(() => {
-  return Parsimmon.seqMap(
-    Parsimmon.index,
-    seq(typeRef, pipedTypeExpr.atLeast(0)),
-    Parsimmon.index,
-    function (startIndex, data, endIndex) {
-      const remaining: any[] = data[1];
-      return {
-        kind: 'typeexpr',
-        types: [data[0], ...remaining],
-        range: { startIndex: startIndex, endIndex: endIndex },
-      };
-    }
-  );
+  return Parsimmon.seqMap(Parsimmon.index, seq(typeRef, pipedTypeExpr.atLeast(0)), Parsimmon.index, function (startIndex, data, endIndex) {
+    const remaining: any[] = data[1];
+    return {
+      kind: 'typeexpr',
+      types: [data[0], ...remaining],
+      range: { startIndex: startIndex, endIndex: endIndex },
+    };
+  });
 });
 
 const pipedTypeExpr: any = pipe.then(typeRef);
@@ -417,18 +379,13 @@ const pipedTypeExpr: any = pipe.then(typeRef);
 // Permission expression.
 // Based on: https://github.com/jneen/parsimmon/blob/93648e20f40c5c0335ac6506b39b0ca58b87b1d9/examples/math.js#L29
 const relationReference: any = Parsimmon.lazy(() => {
-  return Parsimmon.seqMap(
-    Parsimmon.index,
-    seq(identifier),
-    Parsimmon.index,
-    function (startIndex, data, endIndex) {
-      return {
-        kind: 'relationref',
-        relationName: data[0],
-        range: { startIndex: startIndex, endIndex: endIndex },
-      };
-    }
-  );
+  return Parsimmon.seqMap(Parsimmon.index, seq(identifier), Parsimmon.index, function (startIndex, data, endIndex) {
+    return {
+      kind: 'relationref',
+      relationName: data[0],
+      range: { startIndex: startIndex, endIndex: endIndex },
+    };
+  });
 });
 
 const arrowExpr: any = Parsimmon.lazy(() => {
@@ -443,54 +400,38 @@ const arrowExpr: any = Parsimmon.lazy(() => {
         targetRelationOrPermission: data[2],
         range: { startIndex: startIndex, endIndex: endIndex },
       };
-    }
+    },
   );
 });
 
 const nilExpr: any = Parsimmon.lazy(() => {
-  return Parsimmon.seqMap(
-    Parsimmon.index,
-    string('nil'),
-    Parsimmon.index,
-    function (startIndex, data, endIndex) {
-      return {
-        kind: 'nil',
-        isNil: true,
-        range: { startIndex: startIndex, endIndex: endIndex },
-      };
-    }
-  );
+  return Parsimmon.seqMap(Parsimmon.index, string('nil'), Parsimmon.index, function (startIndex, data, endIndex) {
+    return {
+      kind: 'nil',
+      isNil: true,
+      range: { startIndex: startIndex, endIndex: endIndex },
+    };
+  });
 });
 
-const parensExpr: any = Parsimmon.lazy(() =>
-  string('(')
-    .then(expr)
-    .skip(string(')'))
-    .or(arrowExpr)
-    .or(nilExpr)
-    .or(relationReference)
-);
+const parensExpr: any = Parsimmon.lazy(() => string('(').then(expr).skip(string(')')).or(arrowExpr).or(nilExpr).or(relationReference));
 
 function BINARY_LEFT(operatorsParser: any, nextParser: any) {
-  return seqMap(
-    nextParser,
-    seq(operatorsParser, nextParser).many(),
-    (first: any, rest: any) => {
-      return rest.reduce((acc: any, ch: any) => {
-        let [op, another] = ch;
-        return {
-          kind: 'binary',
-          operator: op,
-          left: acc,
-          right: another,
-          range: {
-            startIndex: acc.range.startIndex,
-            endIndex: another.range.endIndex,
-          },
-        };
-      }, first);
-    }
-  );
+  return seqMap(nextParser, seq(operatorsParser, nextParser).many(), (first: any, rest: any) => {
+    return rest.reduce((acc: any, ch: any) => {
+      let [op, another] = ch;
+      return {
+        kind: 'binary',
+        operator: op,
+        left: acc,
+        right: another,
+        range: {
+          startIndex: acc.range.startIndex,
+          endIndex: another.range.endIndex,
+        },
+      };
+    }, first);
+  });
 }
 
 function operators(ops: Record<string, string>) {
@@ -505,21 +446,14 @@ const table = [
   { type: BINARY_LEFT, ops: operators({ exclusion: '-' }) },
 ];
 
-const tableParser: any = table.reduce(
-  (acc: any, level: any) => level.type(level.ops, acc),
-  parensExpr
-);
+const tableParser: any = table.reduce((acc: any, level: any) => level.type(level.ops, acc), parensExpr);
 
 const expr = tableParser.trim(whitespace);
 
 // Definitions members.
 const permission: any = Parsimmon.seqMap(
   Parsimmon.index,
-  seq(
-    lexeme(string('permission')),
-    identifier,
-    equal.then(expr).skip(terminator.atMost(1))
-  ),
+  seq(lexeme(string('permission')), identifier, equal.then(expr).skip(terminator.atMost(1))),
   Parsimmon.index,
   function (startIndex, data, endIndex) {
     return {
@@ -528,16 +462,12 @@ const permission: any = Parsimmon.seqMap(
       expr: data[2],
       range: { startIndex: startIndex, endIndex: endIndex },
     };
-  }
+  },
 );
 
 const relation: any = Parsimmon.seqMap(
   Parsimmon.index,
-  seq(
-    lexeme(string('relation')),
-    identifier,
-    colon.then(typeExpr).skip(terminator.atMost(1))
-  ),
+  seq(lexeme(string('relation')), identifier, colon.then(typeExpr).skip(terminator.atMost(1))),
   Parsimmon.index,
   function (startIndex, data, endIndex) {
     return {
@@ -546,7 +476,7 @@ const relation: any = Parsimmon.seqMap(
       allowedTypes: data[2],
       range: { startIndex: startIndex, endIndex: endIndex },
     };
-  }
+  },
 );
 
 const relationOrPermission = relation.or(permission);
@@ -554,36 +484,25 @@ const relationOrPermission = relation.or(permission);
 // Object Definitions.
 const definition: any = Parsimmon.seqMap(
   Parsimmon.index,
-  seq(
-    lexeme(string('definition')),
-    path,
-    lbrace.then(relationOrPermission.atLeast(0)).skip(rbrace)
-  ),
+  seq(lexeme(string('definition')), path, lbrace.then(relationOrPermission.atLeast(0)).skip(rbrace)),
   Parsimmon.index,
   function (startIndex, data, endIndex) {
     const rp = data[2] as RelationOrPermission[];
     return {
       kind: 'objectDef',
       name: data[1],
-      relations: rp.filter(
-        (relOrPerm: RelationOrPermission) => 'allowedTypes' in relOrPerm
-      ),
-      permissions: rp.filter(
-        (relOrPerm: RelationOrPermission) => !('allowedTypes' in relOrPerm)
-      ),
+      relations: rp.filter((relOrPerm: RelationOrPermission) => 'allowedTypes' in relOrPerm),
+      permissions: rp.filter((relOrPerm: RelationOrPermission) => !('allowedTypes' in relOrPerm)),
       range: { startIndex: startIndex, endIndex: endIndex },
     };
-  }
+  },
 );
 
 // Caveats.
 const caveatParameterTypeExpr: any = Parsimmon.lazy(() => {
   return Parsimmon.seqMap(
     Parsimmon.index,
-    seq(
-      identifier,
-      lcaret.then(caveatParameterTypeExpr).skip(rcaret).atMost(1)
-    ),
+    seq(identifier, lcaret.then(caveatParameterTypeExpr).skip(rcaret).atMost(1)),
     Parsimmon.index,
     function (startIndex, data, endIndex) {
       return {
@@ -592,7 +511,7 @@ const caveatParameterTypeExpr: any = Parsimmon.lazy(() => {
         generics: data[1],
         range: { startIndex: startIndex, endIndex: endIndex },
       };
-    }
+    },
   );
 });
 
@@ -608,7 +527,7 @@ const caveatParameter: any = Parsimmon.lazy(() => {
         type: data[1],
         range: { startIndex: startIndex, endIndex: endIndex },
       };
-    }
+    },
   );
 });
 
@@ -624,34 +543,22 @@ const caveatParameters: any = Parsimmon.lazy(() => {
         parameters: [data[1], ...remaining],
         range: { startIndex: startIndex, endIndex: endIndex },
       };
-    }
+    },
   );
 });
 
 const commaedParameter: any = comma.then(caveatParameter);
 
-const caveatExpression: any = Parsimmon.seqMap(
-  Parsimmon.index,
-  seq(celExpression),
-  Parsimmon.index,
-  function (startIndex, data, endIndex) {
-    return {
-      kind: 'caveatExpr',
-      range: { startIndex: startIndex, endIndex: endIndex },
-    };
-  }
-);
+const caveatExpression: any = Parsimmon.seqMap(Parsimmon.index, seq(celExpression), Parsimmon.index, function (startIndex, data, endIndex) {
+  return {
+    kind: 'caveatExpr',
+    range: { startIndex: startIndex, endIndex: endIndex },
+  };
+});
 
 const caveat: any = Parsimmon.seqMap(
   Parsimmon.index,
-  seq(
-    lexeme(string('caveat')),
-    path,
-    caveatParameters,
-    lbrace,
-    caveatExpression,
-    rbrace
-  ),
+  seq(lexeme(string('caveat')), path, caveatParameters, lbrace, caveatExpression, rbrace),
   Parsimmon.index,
   function (startIndex, data, endIndex) {
     return {
@@ -661,27 +568,19 @@ const caveat: any = Parsimmon.seqMap(
       expression: data[4],
       range: { startIndex: startIndex, endIndex: endIndex },
     };
-  }
+  },
 );
 
 const definitionOrCaveat = definition.or(caveat);
 
-function findReferenceNodeInDef(
-  def: ParsedObjectDefinition,
-  lineNumber: number,
-  columnPosition: number
-): ReferenceNode | undefined {
+function findReferenceNodeInDef(def: ParsedObjectDefinition, lineNumber: number, columnPosition: number): ReferenceNode | undefined {
   const pFound = def.permissions
     .map((permission: ParsedPermission) => {
       if (!rangeContains(permission, lineNumber, columnPosition)) {
         return undefined;
       }
 
-      return findReferenceNodeInPermission(
-        permission,
-        lineNumber,
-        columnPosition
-      );
+      return findReferenceNodeInPermission(permission, lineNumber, columnPosition);
     })
     .filter((f: ParsedRelationRefExpression | TypeRef | undefined) => !!f);
 
@@ -708,7 +607,7 @@ function findReferenceNodeInDef(
 function findReferenceNodeInPermission(
   permission: ParsedPermission,
   lineNumber: number,
-  columnPosition: number
+  columnPosition: number,
 ): ParsedRelationRefExpression | TypeRef | undefined {
   const found = flatMapExpression(permission.expr, (expr: ParsedExpression) => {
     if (expr.range && !rangeContains(expr, lineNumber, columnPosition)) {
@@ -729,7 +628,7 @@ function findReferenceNodeInPermission(
 function findReferenceNodeInRelation(
   relation: ParsedRelation,
   lineNumber: number,
-  columnPosition: number
+  columnPosition: number,
 ): ParsedRelationRefExpression | TypeRef | undefined {
   const found = relation.allowedTypes.types
     .map((typeRef: TypeRef) => {
@@ -744,10 +643,7 @@ function findReferenceNodeInRelation(
   return found.length > 0 ? found[0] : undefined;
 }
 
-function mapParseNodes(
-  node: ParsedNode | undefined,
-  mapper: (node: ParsedNode) => void
-) {
+function mapParseNodes(node: ParsedNode | undefined, mapper: (node: ParsedNode) => void) {
   if (node === undefined) {
     return;
   }
@@ -797,15 +693,8 @@ function mapParseNodes(
   }
 }
 
-function rangeContains(
-  withRange: { range: TextRange },
-  lineNumber: number,
-  columnPosition: number
-): boolean {
-  if (
-    withRange.range.startIndex.line > lineNumber ||
-    withRange.range.endIndex.line < lineNumber
-  ) {
+function rangeContains(withRange: { range: TextRange }, lineNumber: number, columnPosition: number): boolean {
+  if (withRange.range.startIndex.line > lineNumber || withRange.range.endIndex.line < lineNumber) {
     return false;
   }
 
