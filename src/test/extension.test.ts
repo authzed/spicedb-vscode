@@ -1,15 +1,23 @@
+import { Workbench } from 'vscode-extension-tester';
+
 import * as assert from 'assert';
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
-import * as vscode from 'vscode';
 
-// import * as myExtension from '../../extension';
+// TODO(alecmerdler): Write real tests...
 
-suite('Extension Test Suite', () => {
-  vscode.window.showInformationMessage('Start all tests.');
+describe('Sample Command palette tests', () => {
+  it('using executeCommand', async () => {
+    // the simplest way to execute a command
+    // this opens the command palette, puts in the command, and confirms
+    await new Workbench().executeCommand('hello world');
+  });
 
-  test('Sample test', () => {
-    assert.strictEqual(-1, [1, 2, 3].indexOf(5));
-    assert.strictEqual(-1, [1, 2, 3].indexOf(0));
+  it('using the command prompt', async () => {
+    // or you can open the command prompt/palette and work with it as with an input box
+    const prompt = await new Workbench().openCommandPrompt();
+
+    // make sure that when executing a command this way you prepend it with a '>' symbol
+    // otherwise it is going to try and find a file with the given name
+    await prompt.setText('>hello world');
+    await prompt.confirm();
   });
 });
