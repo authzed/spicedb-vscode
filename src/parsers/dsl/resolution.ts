@@ -1,5 +1,4 @@
 import {
-  flatMapExpression,
   ObjectOrCaveatDefinition,
   ParsedCaveatDefinition,
   ParsedCaveatParameter,
@@ -10,6 +9,7 @@ import {
   ParsedRelationRefExpression,
   ParsedSchema,
   TypeRef,
+  flatMapExpression,
 } from './dsl';
 
 /**
@@ -129,15 +129,9 @@ export class Resolver {
   public resolvedReferences(): ResolvedReference[] {
     this.populate();
 
-    const refs = [
-      ...this.lookupAndResolveTypeReferences(),
-      ...this.lookupAndResolveExprReferences(),
-    ];
+    const refs = [...this.lookupAndResolveTypeReferences(), ...this.lookupAndResolveExprReferences()];
     refs.sort((a: ResolvedReference, b: ResolvedReference) => {
-      return (
-        a.reference.range.startIndex.offset -
-        b.reference.range.startIndex.offset
-      );
+      return a.reference.range.startIndex.offset - b.reference.range.startIndex.offset;
     });
     return refs;
   }
@@ -173,7 +167,7 @@ export class Resolver {
    */
   public resolveRelationOrPermission(
     current: ParsedRelationRefExpression,
-    def: ObjectOrCaveatDefinition
+    def: ObjectOrCaveatDefinition,
   ): ExpressionResolution | undefined {
     this.populate();
 
@@ -208,23 +202,19 @@ export class Resolver {
       }
 
       return def.permissions.flatMap((perm: ParsedPermission) => {
-        return flatMapExpression<ResolvedExprReference>(
-          perm.expr,
-          (current: ParsedExpression) => {
-            switch (current.kind) {
-              case 'relationref':
-                return {
-                  kind: 'expression',
-                  reference: current,
-                  resolvedRelationOrPermission:
-                    this.resolveRelationOrPermission(current, def),
-                };
+        return flatMapExpression<ResolvedExprReference>(perm.expr, (current: ParsedExpression) => {
+          switch (current.kind) {
+            case 'relationref':
+              return {
+                kind: 'expression',
+                reference: current,
+                resolvedRelationOrPermission: this.resolveRelationOrPermission(current, def),
+              };
 
-              default:
-                return undefined;
-            }
+            default:
+              return undefined;
           }
-        );
+        });
       });
     });
   }
@@ -252,19 +242,11 @@ export class ResolvedDefinition {
   }
 
   public listRelationsAndPermissions(): (ParsedRelation | ParsedPermission)[] {
-    return [
-      ...Object.values(this.relationsByName),
-      ...Object.values(this.permissionByName),
-    ];
+    return [...Object.values(this.relationsByName), ...Object.values(this.permissionByName)];
   }
 
   public listRelationsAndPermissionNames(): string[] {
-    return Array.from(
-      new Set<string>([
-        ...Object.keys(this.relationsByName),
-        ...Object.keys(this.permissionByName),
-      ])
-    );
+    return Array.from(new Set<string>([...Object.keys(this.relationsByName), ...Object.keys(this.permissionByName)]));
   }
 
   public listWithCaveatNames(): string[] {
@@ -299,9 +281,7 @@ export class ResolvedDefinition {
     return this.permissionByName[name];
   }
 
-  public lookupRelationOrPermission(
-    name: string
-  ): ParsedRelation | ParsedPermission | undefined {
+  public lookupRelationOrPermission(name: string): ParsedRelation | ParsedPermission | undefined {
     const rel = this.lookupRelation(name);
     if (rel) {
       return rel;

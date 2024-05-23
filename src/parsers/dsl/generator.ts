@@ -1,5 +1,4 @@
 import {
-  getCaveatExpression,
   ObjectOrCaveatDefinition,
   ParsedCaveatParameter,
   ParsedCaveatParameterTypeRef,
@@ -7,20 +6,18 @@ import {
   ParsedPermission,
   ParsedRelation,
   ParsedSchema,
-  parseSchema,
   TypeExpr,
   TypeRef,
-} from "./dsl";
+  getCaveatExpression,
+  parseSchema,
+} from './dsl';
 
 /**
  * rewriteSchema rewrites the given schema by prefixing all type refs and type defs with the specified
  * prefix. Returns undefined if the schema could not be parsed and returns the original string if everything
  * has already been prefixed properly.
  */
-export function rewriteSchema(
-  schema: string,
-  prefixSlug: string
-): string | undefined {
+export function rewriteSchema(schema: string, prefixSlug: string): string | undefined {
   const parsed = parseSchema(schema);
   if (!parsed) {
     return undefined;
@@ -28,22 +25,20 @@ export function rewriteSchema(
 
   let hasChanges = false;
   const path = (existing: string) => {
-    const parts = existing.split("/", 2);
+    const parts = existing.split('/', 2);
     if (parts.length === 2 && parts[0] === prefixSlug) {
       return existing;
     }
 
     hasChanges = true;
-    return parts.length === 1
-      ? `${prefixSlug}/${existing}`
-      : `${prefixSlug}/${parts[1]}`;
+    return parts.length === 1 ? `${prefixSlug}/${existing}` : `${prefixSlug}/${parts[1]}`;
   };
 
   parsed.definitions.forEach((def: ObjectOrCaveatDefinition) => {
     def.name = path(def.name);
 
     switch (def.kind) {
-      case "objectDef":
+      case 'objectDef':
         def.relations.forEach((rel: ParsedRelation) => {
           rel.allowedTypes.types.forEach((typeRef: TypeRef) => {
             typeRef.path = path(typeRef.path);
@@ -85,29 +80,27 @@ function generateSchema(parsed: ParsedSchema): string {
   return parsed.definitions
     .map((def: ObjectOrCaveatDefinition) => {
       switch (def.kind) {
-        case "objectDef":
+        case 'objectDef':
           return `definition ${def.name} {
             ${def.relations
               .map(generateRelation)
               .map((s: string) => `  ${s}`)
-              .join("\n")}
+              .join('\n')}
             ${def.permissions
               .map(generatePermission)
               .map((s: string) => `  ${s}`)
-              .join("\n")}
+              .join('\n')}
             }`;
 
-        case "caveatDef":
-          return `caveat ${def.name}(${def.parameters
-            .map(generateCaveatParameter)
-            .join(", ")}) {
+        case 'caveatDef':
+          return `caveat ${def.name}(${def.parameters.map(generateCaveatParameter).join(', ')}) {
               ${getCaveatExpression(def.expression, parsed)}
             }`;
       }
 
-      throw new Error("unknown definition kind in generateSchema");
+      throw new Error('unknown definition kind in generateSchema');
     })
-    .join("\n\n")
+    .join('\n\n')
     .trim();
 }
 
@@ -118,9 +111,7 @@ function generateCaveatParameter(parsed: ParsedCaveatParameter) {
 function generateCaveatParameterType(parsed: ParsedCaveatParameterTypeRef) {
   let paramType = parsed.name;
   if (parsed.generics.length > 0) {
-    paramType += `<${parsed.generics
-      .map(generateCaveatParameterType)
-      .join(", ")}>`;
+    paramType += `<${parsed.generics.map(generateCaveatParameterType).join(', ')}>`;
   }
 
   return paramType;
@@ -133,9 +124,7 @@ function generateRelation(parsed: ParsedRelation): string {
 function generateTypeRefs(parsed: TypeExpr): string {
   return parsed.types
     .map((typeref: TypeRef) => {
-      const withCaveat = typeref.withCaveat
-        ? ` with ${typeref.withCaveat.path}`
-        : "";
+      const withCaveat = typeref.withCaveat ? ` with ${typeref.withCaveat.path}` : '';
 
       if (typeref.relationName) {
         return `${typeref.path}#${typeref.relationName}${withCaveat}`;
@@ -147,7 +136,7 @@ function generateTypeRefs(parsed: TypeExpr): string {
 
       return `${typeref.path}${withCaveat}`;
     })
-    .join(" | ");
+    .join(' | ');
 }
 
 function generatePermission(parsed: ParsedPermission): string {
@@ -155,27 +144,25 @@ function generatePermission(parsed: ParsedPermission): string {
 }
 
 const OPERATOR = {
-  union: "+",
-  intersection: "&",
-  exclusion: "-",
+  union: '+',
+  intersection: '&',
+  exclusion: '-',
 };
 
 function generateExpr(parsed: ParsedExpression): string {
   switch (parsed.kind) {
-    case "arrow":
+    case 'arrow':
       return `${parsed.sourceRelation.relationName}->${parsed.targetRelationOrPermission}`;
 
-    case "binary":
-      return `(${generateExpr(parsed.left)} ${
-        OPERATOR[parsed.operator]
-      } ${generateExpr(parsed.right)})`;
+    case 'binary':
+      return `(${generateExpr(parsed.left)} ${OPERATOR[parsed.operator]} ${generateExpr(parsed.right)})`;
 
-    case "relationref":
+    case 'relationref':
       return parsed.relationName;
 
-    case "nil":
-      return "nil";
+    case 'nil':
+      return 'nil';
   }
 
-  throw Error("unknown expr type in generate expr");
+  throw Error('unknown expr type in generate expr');
 }

@@ -6,9 +6,7 @@ const seq = Parsimmon.seq;
 const optWhitespace = Parsimmon.optWhitespace;
 
 const singleLineComment = regex(/\/\/.*/).then(optWhitespace.atMost(1));
-const multiLineComment = regex(/\/\*((((?!\*\/).)|\r|\n)*)\*\//).then(
-  optWhitespace.atMost(1)
-);
+const multiLineComment = regex(/\/\*((((?!\*\/).)|\r|\n)*)\*\//).then(optWhitespace.atMost(1));
 
 const comment = singleLineComment.or(multiLineComment);
 const whitespace = optWhitespace.then(comment.atLeast(0));
@@ -68,45 +66,26 @@ const nullLiteral = lexeme(string('null'));
 const regexPrefix = lexeme(string('r')).or(lexeme(string('R')));
 const singleQuotedString = lexeme(regex(/'((?:\\.|.)*?)'/));
 const doubleQuotedString = lexeme(regex(/"((?:\\.|.)*?)"/));
-const multilineString = lexeme(regex(/"""((((?!""").)|\r|\n)*)"""/)).or(
-  lexeme(regex(/'''((((?!''').)|\r|\n)*)'''/))
-);
+const multilineString = lexeme(regex(/"""((((?!""").)|\r|\n)*)"""/)).or(lexeme(regex(/'''((((?!''').)|\r|\n)*)'''/)));
 
-const stringLiteral = seq(
-  regexPrefix.atMost(1),
-  multilineString.or(singleQuotedString.or(doubleQuotedString))
-);
+const stringLiteral = seq(regexPrefix.atMost(1), multilineString.or(singleQuotedString.or(doubleQuotedString)));
 
 // BYTES_LIT      ::= [bB] STRING_LIT
 const bytesPrefix = lexeme(string('b')).or(lexeme(string('B')));
 const bytesLiteral = seq(bytesPrefix, stringLiteral);
 
 // LITERAL        ::= INT_LIT | UINT_LIT | FLOAT_LIT | STRING_LIT | BYTES_LIT | BOOL_LIT | NULL_LIT
-const literal = numberLiteral
-  .or(stringLiteral)
-  .or(boolLiteral)
-  .or(nullLiteral)
-  .or(bytesLiteral);
+const literal = numberLiteral.or(stringLiteral).or(boolLiteral).or(nullLiteral).or(bytesLiteral);
 
 const expression = Parsimmon.lazy(() => {
   return celExpression;
 });
 
 // MapInits       = Expr ":" Expr {"," Expr ":" Expr} ;
-const mapInits = seq(
-  expression,
-  colon,
-  expression,
-  seq(comma, expression, colon, expression).atLeast(0)
-);
+const mapInits = seq(expression, colon, expression, seq(comma, expression, colon, expression).atLeast(0));
 
 // FieldInits     = IDENT ":" Expr {"," IDENT ":" Expr} ;
-const fieldInits = seq(
-  identifier,
-  colon,
-  expression,
-  seq(comma, identifier, colon, expression).atLeast(0)
-);
+const fieldInits = seq(identifier, colon, expression, seq(comma, identifier, colon, expression).atLeast(0));
 
 // Primary        = ["."] IDENT ["(" [ExprList] ")"]
 // | "(" Expr ")"
@@ -123,8 +102,8 @@ const primary = literal
       Parsimmon.lazy(() => {
         return exprList;
       }),
-      rbracket
-    )
+      rbracket,
+    ),
   )
   .or(seq(lbrace, mapInits, rbrace))
   .or(identifier);
@@ -141,17 +120,15 @@ const member: Parser<any> = seq(
       identifier,
       seq(lparen, exprList.atMost(1), rparen)
         .or(seq(lbrace, fieldInits, rbrace))
-        .atLeast(0)
+        .atLeast(0),
     )
       .or(seq(lbracket, expression, rbracket))
-      .atLeast(0)
-  )
+      .atLeast(0),
+  ),
 );
 
 // Unary          = Member | "!" {"!"} Member | "-" {"-"} Member
-const unary: Parser<any> = seq(
-  member.or(bang.atLeast(1).then(member)).or(dash.atLeast(1).then(member))
-);
+const unary: Parser<any> = seq(member.or(bang.atLeast(1).then(member)).or(dash.atLeast(1).then(member)));
 
 // Multiplication = [Multiplication ("*" | "/" | "%")] Unary ;
 // NOTE: reordered here to allow for parsing by Parsimmon
@@ -164,8 +141,8 @@ const multiplication: Parser<any> = seq(
     multiplicationOp,
     Parsimmon.lazy(() => {
       return multiplication;
-    })
-  ).atMost(1)
+    }),
+  ).atMost(1),
 );
 
 // Addition       = [Addition ("+" | "-")] Multiplication ;
@@ -177,8 +154,8 @@ const addition: Parser<any> = seq(
     additionOp,
     Parsimmon.lazy(() => {
       return addition;
-    })
-  ).atMost(1)
+    }),
+  ).atMost(1),
 );
 
 // Relop          = "<" | "<=" | ">=" | ">" | "==" | "!=" | "in" ;
@@ -198,8 +175,8 @@ const relation: Parser<any> = seq(
     relOp,
     Parsimmon.lazy(() => {
       return relation;
-    })
-  ).atMost(1)
+    }),
+  ).atMost(1),
 );
 
 // ConditionalAnd = [ConditionalAnd "&&"] Relation ;
@@ -210,8 +187,8 @@ const conditionalAnd: Parser<any> = seq(
     andToken,
     Parsimmon.lazy(() => {
       return conditionalAnd;
-    })
-  ).atMost(1)
+    }),
+  ).atMost(1),
 );
 
 // ConditionalOr  = [ConditionalOr "||"] ConditionalAnd ;
@@ -222,8 +199,8 @@ const conditionalOr: Parser<any> = seq(
     orToken,
     Parsimmon.lazy(() => {
       return conditionalOr;
-    })
-  ).atMost(1)
+    }),
+  ).atMost(1),
 );
 
 // Expr = ConditionalOr ["?" ConditionalOr ":" Expr] ;
@@ -234,8 +211,8 @@ export const celExpression: Parser<any> = conditionalOr.then(
     colon,
     Parsimmon.lazy(() => {
       return celExpression;
-    })
-  ).atMost(1)
+    }),
+  ).atMost(1),
 );
 
 export const parseCELExpression = (value: string) => {

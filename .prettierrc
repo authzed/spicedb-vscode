@@ -1,15 +1,9 @@
 {
-  "plugins": [
-    "@trivago/prettier-plugin-sort-imports"
-  ],
+  "plugins": ["@trivago/prettier-plugin-sort-imports"],
   "printWidth": 140,
   "singleQuote": true,
   "tabWidth": 2,
   "importOrderSeparation": true,
   "importOrderSortSpecifiers": true,
-  "importOrder": [
-    "^vscode",
-    "<THIRD_PARTY_MODULES>",
-    "^[./]"
-  ]
+  "importOrder": ["^vscode", "<THIRD_PARTY_MODULES>", "^[./]"]
 }
