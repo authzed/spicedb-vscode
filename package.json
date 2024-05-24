@@ -2,7 +2,12 @@
   "name": "spicedb-vscode",
   "displayName": "SpiceDB VSCode",
   "description": "VSCode Extension for working with SpiceDB",
+  "publisher": "authzed",
   "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/authzed/spicedb-vscode.git"
+  },
   "engines": {
     "vscode": "^1.87.0"
   },
@@ -28,8 +33,8 @@
         ],
         "configuration": "./language-configuration.json",
         "icon": {
-          "light": "./icons/authzed.svg",
-          "dark": "./icons/authzed.svg"
+          "light": "./icons/authzed-icon-multi-128x128.png",
+          "dark": "./icons/authzed-icon-multi-128x128.png"
         }
       }
     ],
@@ -48,7 +53,7 @@
         {
           "id": "check-watches",
           "title": "Check Watches",
-          "icon": "./icons/authzed.svg"
+          "icon": "./icons/authzed-icon-multi-128x128.png"
         }
       ]
     },
@@ -86,12 +91,14 @@
   "main": "./out/extension.js",
   "scripts": {
     "vscode:prepublish": "yarn run compile",
-    "compile": "tsc -p ./",
+    "download-wasm": "./download-wasm.sh",
+    "compile": "tsc -p ./ && yarn run download-wasm",
     "watch": "tsc -watch -p ./",
     "pretest": "yarn run compile && yarn run lint",
     "lint": "eslint --ext .js,.ts && prettier -c .",
     "lint:fix": "eslint --fix --ext .js,.ts && prettier -w .",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "deploy": "vsce publish --yarn"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
@@ -102,6 +109,7 @@
     "@typescript-eslint/parser": "^7.2.0",
     "@vscode/test-cli": "^0.0.6",
     "@vscode/test-electron": "^2.3.9",
+    "@vscode/vsce": "^2.26.1",
     "eslint": "^8.56.0",
     "prettier": "^3.2.5",
     "typescript": "^5.3.3"
