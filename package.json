@@ -3,7 +3,7 @@
   "displayName": "SpiceDB VSCode",
   "description": "VSCode Extension for working with SpiceDB",
   "publisher": "authzed",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "icon": "icons/authzed-icon-multi-128x128.png",
   "repository": {
     "type": "git",
@@ -99,7 +99,7 @@
     "lint": "eslint --ext .js,.ts && prettier -c .",
     "lint:fix": "eslint --fix --ext .js,.ts && prettier -w .",
     "test": "vscode-test",
-    "deploy": "vsce publish --yarn"
+    "deploy": "vsce publish"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
