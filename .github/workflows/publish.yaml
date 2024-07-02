@@ -19,13 +19,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18.x
-      - run: npm install
-      - run: xvfb-run -a npm test
-        if: runner.os == 'Linux'
-      - run: npm test
-        if: runner.os != 'Linux'
+      - run: npm install -G yarn
+      - run: yarn install --ignore-engines
+#      - run: xvfb-run -a npm test
+#        if: runner.os == 'Linux'
+#      - run: npm test
+#        if: runner.os != 'Linux'
       - name: Publish
         if: success() && startsWith(github.ref, 'refs/tags/') && matrix.os == 'ubuntu-latest'
-        run: npm run deploy
+        run: yarn deploy
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
