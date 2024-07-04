@@ -1,2 +1,2 @@
 cd src/check-watch-panel
-yarn build-dist
+yarn build
