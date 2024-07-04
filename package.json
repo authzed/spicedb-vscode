@@ -3,7 +3,7 @@
   "displayName": "SpiceDB VSCode",
   "description": "VSCode Extension for working with SpiceDB",
   "publisher": "authzed",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "icon": "icons/authzed-icon-multi-128x128.png",
   "repository": {
     "type": "git",
@@ -93,7 +93,8 @@
   "scripts": {
     "vscode:prepublish": "yarn run compile",
     "download-wasm": "./download-wasm.sh",
-    "compile": "tsc -p ./ && yarn run download-wasm",
+    "build-panels": "./build-panels.sh",
+    "compile": "tsc -p ./ && yarn run download-wasm && yarn run build-panels",
     "watch": "tsc -watch -p ./",
     "pretest": "yarn run compile && yarn run lint",
     "lint": "eslint --ext .js,.ts && prettier -c .",
