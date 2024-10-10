@@ -2,6 +2,9 @@ on:
   release:
     types:
       - published
+  pull_request:
+    branches:
+      - "*"
 
 jobs:
   build:
@@ -21,6 +24,12 @@ jobs:
 #        if: runner.os == 'Linux'
 #      - run: npm test
 #        if: runner.os != 'Linux'
+      - name: Write release version
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          echo Version: $VERSION
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+      - run: "npm version 1.0.0"
       - name: Publish
         run: yarn deploy
         env:
