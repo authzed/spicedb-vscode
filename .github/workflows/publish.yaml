@@ -4,7 +4,7 @@ on:
       - main
   release:
     types:
-      - created
+      - published
 
 jobs:
   build:
