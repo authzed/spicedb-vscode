@@ -2,13 +2,16 @@ on:
   release:
     types:
       - published
+  pull_request:
+    branches:
+      - "*"
 
+# NOTE: this is a separate workflow because
+# the version-setting relies on environment variables,
+# and that works differently in powershell.
 jobs:
   build:
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -17,15 +20,12 @@ jobs:
         with:
           node-version: 18.x
       - run: yarn install --ignore-engines
-#      - run: xvfb-run -a npm test
-#        if: runner.os == 'Linux'
-#      - run: npm test
-#        if: runner.os != 'Linux'
       - name: Write release version
         run: |
-          VERSION=${GITHUB_REF_NAME#v}
-          echo Version: $VERSION
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          $env:GITHUB_REF_NAME -match "v(?<version>.*)"
+          $VERSION=$matches['version']
+          "Version: $VERSION"
+          $env:GITHUB_ENV += "\nVERSION=$VERSION"
       - run: "npm version 1.0.0 --no-git-tag-version"
       - name: Publish
         run: yarn deploy
