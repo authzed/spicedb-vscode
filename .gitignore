@@ -1,7 +1,6 @@
 out
 dist
 node_modules
-yarn.lock
 src/check-watch-panel/public/main.wasm
 .vscode-test/
 *.vsix
