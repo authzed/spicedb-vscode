@@ -22,10 +22,10 @@ jobs:
           cache: 'yarn'
       - run: yarn install --ignore-engines
       - name: Write release version
+        if: false
         run: |
           $env:GITHUB_REF_NAME
           $env:GITHUB_REF_NAME -match "v(?<version>.*)"
-          set-strictmode -off
           $VERSION=$Matches['version']
           "Version: $VERSION"
           $env:GITHUB_ENV += "\nVERSION=$VERSION"
