@@ -2,9 +2,6 @@ on:
   release:
     types:
       - published
-  pull_request:
-    branches:
-      - "*"
 
 # NOTE: this is a separate workflow because
 # the version-setting relies on environment variables,
@@ -23,12 +20,12 @@ jobs:
       - run: yarn install --ignore-engines
       - name: Write release version
         run: |
-          $env:GITHUB_REF_NAME = "v1.0.0"
+          $env:GITHUB_REF_NAME
           $env:GITHUB_REF_NAME -match "v(?<version>.*)"
           $VERSION=$Matches['version']
           "Version: $VERSION"
           $env:GITHUB_ENV += "\nVERSION=$VERSION"
-      - run: "npm version 1.0.0 --no-git-tag-version"
+      - run: "npm version ${VERSION} --no-git-tag-version"
       - name: Publish
         run: yarn deploy
         env:
