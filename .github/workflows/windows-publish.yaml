@@ -25,6 +25,7 @@ jobs:
         run: |
           $env:GITHUB_REF_NAME
           $env:GITHUB_REF_NAME -match "v(?<version>.*)"
+          set-strictmode -off
           $VERSION=$Matches['version']
           "Version: $VERSION"
           $env:GITHUB_ENV += "\nVERSION=$VERSION"
