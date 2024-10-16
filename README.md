@@ -19,6 +19,12 @@ The SpiceDB VS Code Extension can be installed from the [VS Code Extension Marke
 
 [VS Code Extension Marketplace]: https://marketplace.visualstudio.com/items?itemName=authzed.spicedb-vscode
 
+### Updating SpiceDB
+This extension uses SpiceDB's language server which is a part of the SpiceDB binary. You're prompted to install
+SpiceDB if you haven't already the first time you run the extension. If there's a new language feature, you'll
+need to update the installed SpiceDB binary to the most recent version to use that feature, according to whatever
+installation mechanism you originally used.
+
 ## Features
 
 ### Syntax and Semantic Highlighting for SpiceDB Schema
