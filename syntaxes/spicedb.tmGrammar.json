@@ -37,7 +37,7 @@
     },
     "definition": {
       "comment": "definition of a resource type in schema",
-      "begin": "(\\bdefinition\\b)\\s+([a-zA-Z_]\\w*)\\s*(\\{)",
+      "begin": "(\\bdefinition\\b)\\s+(([a-z][\\w]{1,62}[a-z0-9]\\/)*[a-z][\\w]{1,62}[a-z0-9])\\s*(\\{)",
       "beginCaptures": {
         "1": {
           "name": "keyword.class.definition"
@@ -45,7 +45,7 @@
         "2": {
           "name": "entity.name.class"
         },
-        "3": {
+        "4": {
           "name": "punctuation.definition.brace"
         }
       },
