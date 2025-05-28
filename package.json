@@ -3,7 +3,7 @@
   "displayName": "SpiceDB VSCode",
   "description": "VSCode Extension for working with SpiceDB",
   "publisher": "authzed",
-  "version": "0.0.8",
+  "version": "1.0.3",
   "icon": "icons/authzed-icon-multi-128x128.png",
   "repository": {
     "type": "git",
