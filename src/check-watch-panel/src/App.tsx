@@ -5,7 +5,7 @@ import yaml from 'yaml';
 
 import './App.css';
 import { useDeveloperService } from './services/developerservice';
-import { LiveCheckItem, LiveCheckItemStatus, useLiveCheckService } from './services/livecheck';
+import { LiveCheckItem, LiveCheckItemStatus, LiveCheckStatus, useLiveCheckService } from './services/livecheck';
 
 function App() {
   useEffect(() => {
@@ -14,6 +14,14 @@ function App() {
   }, []);
 
   const [activeFilePath, setActiveFilePath] = useState<string | undefined>((window as any).ACTIVE_FILE_PATH);
+
+  const [activeSchemaPath, setActiveSchemaPath] = useState<string | null>(null);
+  const [activeSchema, setActiveSchema] = useState<string | null>(null);
+
+  const [activeYamlPath, setActiveYamlPath] = useState<string | null>(null);
+  const [activeYaml, setActiveYaml] = useState<string | null>(null);
+
+  const [yamlIssue, setYamlIssue] = useState<string | null>(null);
 
   const devService = useDeveloperService();
   const liveCheckService = useLiveCheckService(devService);
@@ -27,16 +35,43 @@ function App() {
           break;
 
         case 'schema':
-          liveCheckService.updateSchema(message.schema);
+          setActiveSchemaPath(message.filename);
+          setActiveSchema(message.schema);
+          if (message.schema) {
+            liveCheckService.updateSchema(message.schema);
+          }
           break;
 
         case 'yaml':
-          liveCheckService.updateRelationships(
-            yaml.parse(message.yaml, {
-              prettyErrors: true,
-              strict: true,
-            }).relationships ?? '',
-          );
+          setActiveYamlPath(message.filename);
+          setActiveYaml(message.yaml);
+
+          if (message.yaml) {
+            let parsed = null;
+            try {
+              parsed = yaml.parse(message.yaml, {
+                prettyErrors: true,
+                strict: true,
+              });
+            } catch (error: any) {
+              setYamlIssue(error.toString());
+              return;
+            }
+
+            if (!('relationships' in parsed)) {
+              setYamlIssue('YAML file does not contain a "relationships" block');
+              return;
+            }
+
+            const relationships = parsed.relationships;
+            if (typeof relationships !== 'string') {
+              setYamlIssue('YAML file "relationships" block must be a string, containing a relationship per newline');
+              return;
+            }
+
+            setYamlIssue(null);
+            liveCheckService.updateRelationships(relationships);
+          }
           break;
 
         case 'activeFile':
@@ -76,44 +111,122 @@ function App() {
   };
 
   const isValidFile = !!activeFilePath && (activeFilePath.endsWith('.zed') || activeFilePath.endsWith('.zed.yaml'));
+  const hasValidSchemaAndYaml = !!activeSchema && !!activeYaml && !yamlIssue;
 
   return (
     <VSCodePanelView>
-      {devService.state.status !== 'ready' && <VSCodeProgressRing />}
-      {devService.state.status === 'ready' && !isValidFile && (
-        <div>
-          <div>The current editor is not viewing a SpiceDB schema or relationships file</div>
+      {!isValidFile && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <i className="codicon codicon-info"></i>
+          <div>
+            The current editor is not viewing a SpiceDB schema (<code>.zed</code>) file or relationships data file (<code>.zed.yaml</code>)
+            file
+          </div>
         </div>
       )}
-      {devService.state.status === 'ready' && isValidFile && (
-        <div style={{ width: '100%' }}>
-          {liveCheckService.items.length > 0 && (
-            <table style={{ width: '100%' }}>
-              <thead className="table-header">
-                <th></th>
-                <th>Resource</th>
-                <th>Permission</th>
-                <th>Subject</th>
-                <th>Caveat (Optional)</th>
-                <th></th>
-              </thead>
-              {liveCheckService.items.map((item, index) => {
-                return (
-                  <WatchRow
-                    item={item}
-                    key={index}
-                    onRemoveWatch={() => removeWatch(index)}
-                    onChange={(field, value) => updateWatch(index, field, value)}
-                  />
-                );
-              })}
-            </table>
-          )}
-          {liveCheckService.items.length === 0 && (
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <VSCodeButton onClick={() => liveCheckService.addItem()}>Add Watch</VSCodeButton>
+      {isValidFile && !hasValidSchemaAndYaml && (
+        <>
+          {!activeSchema && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <i className="codicon codicon-warning"></i>
+              <div>
+                No schema file with extension <code>.zed</code> found in the current directory.
+              </div>
             </div>
           )}
+          {!!activeSchema && !activeYaml && (
+            <div style={{ display: 'block', textAlign: 'left' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <i className="codicon codicon-warning"></i>
+                <div>
+                  No valid relationships file with extension <code>.zed.yaml</code> found matching the schema file{' '}
+                  <code>{activeSchemaPath}</code>
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '20px' }}>
+                <i className="codicon codicon-arrow-circle-right"></i>
+                <div>
+                  To enable the Check Watches panel, please create a YAML file named <code>{activeSchemaPath}.yaml</code>
+                </div>
+              </div>
+            </div>
+          )}
+          {!!yamlIssue && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <i className="codicon codicon-warning"></i>
+              <div style={{ color: '#FF8488' }}>
+                Parse failure for YAML relationships file <code>{activeYamlPath}</code>: {yamlIssue}
+              </div>
+            </div>
+          )}
+        </>
+      )}
+      {isValidFile && hasValidSchemaAndYaml && devService.state.status !== 'ready' && <VSCodeProgressRing />}
+      {isValidFile && hasValidSchemaAndYaml && devService.state.status === 'ready' && (
+        <div style={{ width: '100%' }}>
+          <div style={{ position: 'relative', width: '100%' }}>
+            {(liveCheckService.state.status === LiveCheckStatus.SERVICE_ERROR ||
+              liveCheckService.state.status === LiveCheckStatus.PARSE_ERROR) && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '0',
+                  left: '0',
+                  bottom: '0',
+                  right: '0',
+                  width: '100%',
+                  padding: '10px',
+                  backgroundColor: 'rgba(32, 32, 32, 0.9)',
+                  zIndex: '100000000000',
+                }}
+              >
+                {liveCheckService.state.status === LiveCheckStatus.SERVICE_ERROR && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <i className="codicon codicon-error"></i>
+                    <div style={{ color: 'red' }}>An error occurred while trying to run the checks</div>
+                  </div>
+                )}
+                {liveCheckService.state.status === LiveCheckStatus.PARSE_ERROR && (
+                  <div>
+                    {liveCheckService.state.requestErrors?.map((err, index) => (
+                      <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'orange', marginBottom: '5px' }}>
+                        <i className="codicon codicon-warning"></i> {err.message}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            <div>
+              {liveCheckService.items.length > 0 && (
+                <table style={{ width: '100%' }}>
+                  <thead className="table-header">
+                    <th></th>
+                    <th>Resource</th>
+                    <th>Permission</th>
+                    <th>Subject</th>
+                    <th>Caveat (Optional)</th>
+                    <th></th>
+                  </thead>
+                  {liveCheckService.items.map((item, index) => {
+                    return (
+                      <WatchRow
+                        item={item}
+                        key={index}
+                        onRemoveWatch={() => removeWatch(index)}
+                        onChange={(field, value) => updateWatch(index, field, value)}
+                      />
+                    );
+                  })}
+                </table>
+              )}
+              {liveCheckService.items.length === 0 && (
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <VSCodeButton onClick={() => liveCheckService.addItem()}>Add SpiceDB Check Watch</VSCodeButton>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </VSCodePanelView>

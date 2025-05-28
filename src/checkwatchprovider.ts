@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { Uri, Webview } from 'vscode';
 
 import fs from 'fs';
+import fsp from 'fs/promises';
 
 function getUri(webview: Webview, extensionUri: Uri, pathList: string[]) {
   return webview.asWebviewUri(Uri.joinPath(extensionUri, ...pathList));
@@ -40,6 +41,8 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
   }
 
   public async performUpdate(fsPath: string) {
+    this.setActiveFile(fsPath);
+
     let schemaContentsPath = '';
     let yamlContentsPath = '';
 
@@ -54,17 +57,29 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
     let schemaContents = '';
     let yamlContents = '';
 
-    if (schemaContentsPath) {
-      schemaContents = fs.readFileSync(schemaContentsPath, 'utf8');
+    if (schemaContentsPath && fs.existsSync(schemaContentsPath)) {
+      try {
+        schemaContents = await fsp.readFile(schemaContentsPath, 'utf8');
+        this.setActiveSchema(schemaContentsPath, schemaContents);
+      } catch (e) {
+        console.error(`Error reading schema file at ${schemaContentsPath}:`, e);
+        this.setActiveSchema(null, null);
+      }
+    } else {
+      this.setActiveSchema(null, null);
     }
 
-    if (yamlContentsPath) {
-      yamlContents = fs.readFileSync(yamlContentsPath, 'utf8');
+    if (yamlContentsPath && fs.existsSync(yamlContentsPath)) {
+      try {
+        yamlContents = await fsp.readFile(yamlContentsPath, 'utf8');
+        this.setActiveYaml(yamlContentsPath, yamlContents);
+      } catch (e) {
+        console.error(`Error reading YAML file at ${yamlContentsPath}:`, e);
+        this.setActiveYaml(null, null);
+      }
+    } else {
+      this.setActiveYaml(null, null);
     }
-
-    this.setActiveFile(fsPath);
-    this.setActiveSchema(schemaContents);
-    this.setActiveYaml(yamlContents);
   }
 
   public addWatch() {
@@ -80,19 +95,21 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
     }
   }
 
-  public setActiveSchema(schema: string) {
+  public setActiveSchema(filename: string | null, schema: string | null) {
     if (this._view) {
       this._view.webview.postMessage({
         type: 'schema',
+        filename,
         schema,
       });
     }
   }
 
-  public setActiveYaml(yaml: string) {
+  public setActiveYaml(filename: string | null, yaml: string | null) {
     if (this._view) {
       this._view.webview.postMessage({
         type: 'yaml',
+        filename,
         yaml,
       });
     }
@@ -122,7 +139,7 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
 			<head>
 				<meta charset="UTF-8">
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Check Watches</title>
+                <title>SpiceDB Watches</title>
 				<link href="${cssUri}" rel="stylesheet">
 				<link href="${codiconsUri}" rel="stylesheet" />
 				<script>
