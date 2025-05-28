@@ -1,23 +1,23 @@
 ---
-name: "CLA"
-on:  # yamllint disable-line rule:truthy
+name: 'CLA'
+on: # yamllint disable-line rule:truthy
   issue_comment:
     types:
-      - "created"
+      - 'created'
   pull_request_target:
     types:
-      - "opened"
-      - "closed"
-      - "synchronize"
+      - 'opened'
+      - 'closed'
+      - 'synchronize'
   merge_group:
     types:
-      - "checks_requested"
+      - 'checks_requested'
 jobs:
   cla:
-    name: "Check Signature"
-    runs-on: "ubuntu-latest"
+    name: 'Check Signature'
+    runs-on: 'ubuntu-latest'
     steps:
-      - uses: "authzed/actions/cla-check@main"
+      - uses: 'authzed/actions/cla-check@main'
         with:
-          github_token: "${{ secrets.GITHUB_TOKEN }}"
-          cla_assistant_token: "${{ secrets.CLA_ASSISTANT_ACCESS_TOKEN }}"
+          github_token: '${{ secrets.GITHUB_TOKEN }}'
+          cla_assistant_token: '${{ secrets.CLA_ASSISTANT_ACCESS_TOKEN }}'

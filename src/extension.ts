@@ -31,13 +31,13 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.workspace.onDidChangeTextDocument((e: vscode.TextDocumentChangeEvent) => {
       if (e.document.uri.fsPath.endsWith('.zed')) {
         if (vscode.window.activeTextEditor?.document.uri.fsPath === e.document.uri.fsPath) {
-          checkWatchProvider.setActiveSchema(e.document.getText());
+          checkWatchProvider.setActiveSchema(e.document.uri.fsPath, e.document.getText());
         }
       }
 
       if (e.document.uri.fsPath.endsWith('.zed.yaml')) {
         if (vscode.window.activeTextEditor?.document.uri.fsPath === e.document.uri.fsPath) {
-          checkWatchProvider.setActiveYaml(e.document.getText());
+          checkWatchProvider.setActiveYaml(e.document.uri.fsPath, e.document.getText());
         }
       }
     }),

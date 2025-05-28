@@ -20,7 +20,7 @@ jobs:
           VERSION=${GITHUB_REF_NAME#v}
           echo Version: $VERSION
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-      - run: "npm version ${VERSION} --no-git-tag-version"
+      - run: 'npm version ${VERSION} --no-git-tag-version'
       - name: Publish
         run: yarn deploy
         env:
