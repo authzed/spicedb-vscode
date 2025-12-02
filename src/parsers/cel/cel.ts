@@ -14,7 +14,8 @@ const lexeme = function (p: any) {
   return p.skip(whitespace);
 };
 
-const reserved = [
+/*
+The following are reserved keywords in CEL:
   'in',
   'as',
   'break',
@@ -33,7 +34,7 @@ const reserved = [
   'var',
   'void',
   'while',
-];
+*/
 
 const identifier = lexeme(regex(/[a-zA-Z_][0-9a-zA-Z_+]*/));
 

@@ -91,24 +91,28 @@ export function getCaveatExpression(expr: ParsedCaveatExpression, parsed: Parsed
  */
 export function flatMapExpression<T>(expr: ParsedExpression, walker: ExprWalker<T>): T[] {
   switch (expr.kind) {
-    case 'arrow':
+    case 'arrow': {
       const arrowResult = walker(expr);
       const childResults = flatMapExpression<T>(expr.sourceRelation, walker);
       return arrowResult ? [...childResults, arrowResult] : childResults;
+    }
 
-    case 'nil':
+    case 'nil': {
       const nilResult = walker(expr);
       return nilResult ? [nilResult] : [];
+    }
 
-    case 'relationref':
+    case 'relationref': {
       const result = walker(expr);
       return result ? [result] : [];
+    }
 
-    case 'binary':
+    case 'binary': {
       const binResult = walker(expr);
       const leftResults = flatMapExpression<T>(expr.left, walker);
       const rightResults = flatMapExpression<T>(expr.right, walker);
       return binResult ? [...leftResults, ...rightResults, binResult] : [...leftResults, ...rightResults];
+    }
   }
 }
 
@@ -405,7 +409,7 @@ const arrowExpr: any = Parsimmon.lazy(() => {
 });
 
 const nilExpr: any = Parsimmon.lazy(() => {
-  return Parsimmon.seqMap(Parsimmon.index, string('nil'), Parsimmon.index, function (startIndex, data, endIndex) {
+  return Parsimmon.seqMap(Parsimmon.index, string('nil'), Parsimmon.index, function (startIndex, _data, endIndex) {
     return {
       kind: 'nil',
       isNil: true,
@@ -419,7 +423,7 @@ const parensExpr: any = Parsimmon.lazy(() => string('(').then(expr).skip(string(
 function BINARY_LEFT(operatorsParser: any, nextParser: any) {
   return seqMap(nextParser, seq(operatorsParser, nextParser).many(), (first: any, rest: any) => {
     return rest.reduce((acc: any, ch: any) => {
-      let [op, another] = ch;
+      const [op, another] = ch;
       return {
         kind: 'binary',
         operator: op,
@@ -437,7 +441,7 @@ function BINARY_LEFT(operatorsParser: any, nextParser: any) {
 function operators(ops: Record<string, string>) {
   const keys = Object.keys(ops).sort();
   const ps = keys.map((k) => string(ops[k]).trim(optWhitespace).result(k));
-  return alt.apply(null, ps);
+  return alt(...ps);
 }
 
 const table = [
@@ -549,12 +553,17 @@ const caveatParameters: any = Parsimmon.lazy(() => {
 
 const commaedParameter: any = comma.then(caveatParameter);
 
-const caveatExpression: any = Parsimmon.seqMap(Parsimmon.index, seq(celExpression), Parsimmon.index, function (startIndex, data, endIndex) {
-  return {
-    kind: 'caveatExpr',
-    range: { startIndex: startIndex, endIndex: endIndex },
-  };
-});
+const caveatExpression: any = Parsimmon.seqMap(
+  Parsimmon.index,
+  seq(celExpression),
+  Parsimmon.index,
+  function (startIndex, _data, endIndex) {
+    return {
+      kind: 'caveatExpr',
+      range: { startIndex: startIndex, endIndex: endIndex },
+    };
+  },
+);
 
 const caveat: any = Parsimmon.seqMap(
   Parsimmon.index,
