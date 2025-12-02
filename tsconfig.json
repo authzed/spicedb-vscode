@@ -13,9 +13,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUnusedParameters": true
   },
-  "exclude": [
-    "src/check-watch-panel/**/*",
-    "node_modules",
-    ".vscode-test"
-  ]
+  "exclude": ["src/check-watch-panel/**/*", "node_modules", ".vscode-test"]
 }

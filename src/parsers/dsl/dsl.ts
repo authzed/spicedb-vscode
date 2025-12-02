@@ -553,12 +553,17 @@ const caveatParameters: any = Parsimmon.lazy(() => {
 
 const commaedParameter: any = comma.then(caveatParameter);
 
-const caveatExpression: any = Parsimmon.seqMap(Parsimmon.index, seq(celExpression), Parsimmon.index, function (startIndex, _data, endIndex) {
-  return {
-    kind: 'caveatExpr',
-    range: { startIndex: startIndex, endIndex: endIndex },
-  };
-});
+const caveatExpression: any = Parsimmon.seqMap(
+  Parsimmon.index,
+  seq(celExpression),
+  Parsimmon.index,
+  function (startIndex, _data, endIndex) {
+    return {
+      kind: 'caveatExpr',
+      range: { startIndex: startIndex, endIndex: endIndex },
+    };
+  },
+);
 
 const caveat: any = Parsimmon.seqMap(
   Parsimmon.index,

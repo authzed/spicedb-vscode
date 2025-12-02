@@ -5,7 +5,7 @@ import commandExists from 'command-exists';
 export async function languageServerBinaryPath(_context: vscode.ExtensionContext): Promise<string | undefined> {
   try {
     return await commandExists('spicedb');
-  } catch (e) {
+  } catch (_e) {
     return undefined;
   }
 }
