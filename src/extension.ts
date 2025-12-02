@@ -48,7 +48,7 @@ export function activate(context: vscode.ExtensionContext) {
     provideDefinition: function (
       document: vscode.TextDocument,
       position: vscode.Position,
-      token: vscode.CancellationToken,
+      _token: vscode.CancellationToken,
     ): vscode.ProviderResult<vscode.Definition> {
       const text = document.getText();
       const parserResult = parse(text);
@@ -122,7 +122,7 @@ export function activate(context: vscode.ExtensionContext) {
     {
       provideDocumentSemanticTokens: function (
         document: vscode.TextDocument,
-        token: vscode.CancellationToken,
+        _token: vscode.CancellationToken,
       ): vscode.ProviderResult<vscode.SemanticTokens> {
         const text = document.getText();
         const parserResult = parse(text);
