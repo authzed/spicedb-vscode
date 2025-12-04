@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
 import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient/node';
 
+import { type ResolvedReference, Resolver, findReferenceNode, parse } from '@authzed/spicedb-parser-js';
+
 import { getInstallCommand, languageServerBinaryPath } from './binary';
 import { CheckWatchProvider } from './checkwatchprovider';
-import { findReferenceNode, parse } from './parsers/dsl/dsl';
-import { ResolvedReference, Resolver } from './parsers/dsl/resolution';
 
 export function activate(context: vscode.ExtensionContext) {
   console.log('spicedb-vscode is now active');

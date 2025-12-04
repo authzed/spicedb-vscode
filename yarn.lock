@@ -2,6 +2,14 @@
 # yarn lockfile v1
 
 
+"@authzed/spicedb-parser-js@^1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@authzed/spicedb-parser-js/-/spicedb-parser-js-1.0.5.tgz#64f091a8f8daa88f56ea28df84828c6fd5c8a3ea"
+  integrity sha512-FPCkjEXqxmS01BwPFtqgGZlxTVRR42hEz3S0bVFftFA+seZt5ysoN6Q8+KS0W9+hNgMIMDrvqyvEUYV51GUc1g==
+  dependencies:
+    "@types/parsimmon" "^1.10.9"
+    parsimmon "^1.18.1"
+
 "@azu/format-text@^1.0.1", "@azu/format-text@^1.0.2":
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/@azu/format-text/-/format-text-1.0.2.tgz#abd46dab2422e312bd1bfe36f0d427ab6039825d"

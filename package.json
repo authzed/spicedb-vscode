@@ -121,6 +121,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@authzed/spicedb-parser-js": "^1.0.5",
     "@types/command-exists": "^1.2.3",
     "@types/parsimmon": "^1.10.9",
     "command-exists": "^1.2.9",
