@@ -227,7 +227,7 @@
     "caveat": {
       "comment": "caveat in schema",
       "name": "meta.embedded.block.cel",
-      "begin": "(\\bcaveat\\b)\\s+([a-zA-Z_]\\w*)\\s*\\(([^\\)]*)\\)\\s*(\\{)",
+      "begin": "(\\bcaveat\\b)\\s+(([a-z][\\w]{1,62}[a-z0-9]\\/)*[a-z][\\w]{1,62}[a-z0-9])\\s*\\(([^\\)]*)\\)\\s*(\\{)",
       "beginCaptures": {
         "1": {
           "name": "keyword.function.definition"
@@ -235,10 +235,10 @@
         "2": {
           "name": "entity.name.function"
         },
-        "3": {
+        "4": {
           "patterns": [{ "include": "#caveatParameter" }, { "include": "#caveatTypeName" }, { "include": "#comma" }]
         },
-        "4": {
+        "5": {
           "name": "punctuation.definition.brace"
         }
       },
@@ -290,7 +290,7 @@
     },
     "with_caveat": {
       "comment": "with_caveat",
-      "match": "\\s*(with)\\s*([a-zA-Z_]*)\\s*",
+      "match": "\\s*(with)\\s*(([a-z][\\w]{1,62}[a-z0-9]\\/)*[a-z][\\w]{1,62}[a-z0-9])\\s*",
       "captures": {
         "1": {
           "name": "keyword.class.definition"
