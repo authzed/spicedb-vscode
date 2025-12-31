@@ -1,0 +1,36 @@
+// this is a standard schema that should have every available feature (wildcards, caveats, etc)
+use expiration
+
+definition user {}
+
+definition group {
+	relation member: user with non_expired_grant | user with expiration
+	relation member2: user:* with non_expired_grant
+}
+
+definition document {
+	relation group: group
+    
+	relation aaa: user:* | group#member
+	relation bbb: user:*
+	relation ccc: user:*
+	relation ddd: user:*
+
+
+	// a comment
+	permission view = aaa
+
+	permission nilable = nil
+
+
+	/* another comment */
+	permission view2 = aaa + bbb
+	permission view3 = (aaa + bbb) - (ccc & ddd)
+	permission view4 = group.any(member)
+	permission view5 = group.all(member)
+	permission view6 = group->member
+}
+
+caveat non_expired_grant(name string, description string) {
+  name.matches("-$test") || size(description) >= 100
+}

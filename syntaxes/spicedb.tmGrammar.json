@@ -6,6 +6,7 @@
   "foldingStopMarker": "^\\s*\\}",
   "patterns": [
     { "include": "#comment" },
+    { "include": "#use" },
     { "include": "#definition" },
     { "include": "#caveat" },
     { "include": "#relation" },
@@ -77,6 +78,8 @@
         { "include": "#indirectRelationType" },
         { "include": "#directRelationType" },
         { "include": "#pipe" },
+        { "include": "#with_caveat" },
+        { "include": "#with_expiration" },
         { "include": "#comment" }
       ]
     },
@@ -141,6 +144,8 @@
       "end": "(?<=\\;|\\n)",
       "patterns": [
         { "include": "#comment" },
+        { "include": "#arrow_alternative" },
+        { "include": "#arrow_intersection" },
         { "include": "#arrow" },
         { "include": "#nil" },
         { "include": "#relationRef" },
@@ -177,6 +182,36 @@
     "arrow": {
       "comment": "arrow",
       "match": "\\s*([a-zA-Z_]\\w*)(\\-\\>)([a-zA-Z_]\\w*)\\s*",
+      "captures": {
+        "1": {
+          "name": "entity.name.variable"
+        },
+        "2": {
+          "name": "keyword.operator.arrow markup.bold.authzed"
+        },
+        "3": {
+          "name": "entity.name.variable"
+        }
+      }
+    },
+    "arrow_alternative": {
+      "comment": "arrow_alternative",
+      "match": "\\s*([a-zA-Z_]\\w*)(\\.any)\\(([a-zA-Z_]\\w*)\\)\\s*",
+      "captures": {
+        "1": {
+          "name": "entity.name.variable"
+        },
+        "2": {
+          "name": "keyword.operator.arrow markup.bold.authzed"
+        },
+        "3": {
+          "name": "entity.name.variable"
+        }
+      }
+    },
+    "arrow_intersection": {
+      "comment": "arrow_alternative",
+      "match": "\\s*([a-zA-Z_]\\w*)(\\.all)\\(([a-zA-Z_]\\w*)\\)\\s*",
       "captures": {
         "1": {
           "name": "entity.name.variable"
@@ -240,6 +275,42 @@
       "comment": "comma",
       "match": "\\s*\\,\\s*",
       "name": "punctuation.definition.comma"
+    },
+    "use": {
+      "comment": "use",
+      "match": "\\s*(use)\\s*([a-zA-Z_]\\w*)\\s*",
+      "captures": {
+        "1": {
+          "name": "keyword.class.definition"
+        },
+        "2": {
+          "name": "keyword.class.definition"
+        }
+      }
+    },
+    "with_caveat": {
+      "comment": "with_caveat",
+      "match": "\\s*(with)\\s*([a-zA-Z_]*)\\s*",
+      "captures": {
+        "1": {
+          "name": "keyword.class.definition"
+        },
+        "2": {
+          "name": "entity.name.function"
+        }
+      }
+    },
+    "with_expiration": {
+      "comment": "with_expiration",
+      "match": "\\s*(with)\\s*(expiration)\\s*",
+      "captures": {
+        "1": {
+          "name": "keyword.class.definition"
+        },
+        "2": {
+          "name": "keyword.class.definition"
+        }
+      }
     }
   }
 }
