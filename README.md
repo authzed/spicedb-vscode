@@ -44,3 +44,7 @@ installation mechanism you originally used.
 ### Built-in check watch
 
 <img src="assets/check-watches.gif" height="450">
+
+## Acknowledgments
+
+The syntax for the CEL language (used in caveats) was copied from [vscode-cel](https://github.com/hmarr/vscode-cel).
