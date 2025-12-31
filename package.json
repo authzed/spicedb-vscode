@@ -10,7 +10,7 @@
     "url": "https://github.com/authzed/spicedb-vscode.git"
   },
   "engines": {
-    "vscode": "^1.87.0"
+    "vscode": "^1.106.1"
   },
   "extensionKind": [
     "ui",
@@ -91,18 +91,18 @@
   "activationEvents": [],
   "main": "./out/extension.js",
   "scripts": {
+    "vscode:build": "vsce package -o spicedb.vsix --no-yarn",
     "vscode:prepublish": "yarn run compile",
+    "vscode:publish": "vsce publish --no-yarn",
     "download-wasm": "./download-wasm.sh",
-    "build-panels": "./build-panels.sh",
-    "compile": "tsc -p ./ && yarn run build-panels",
+    "compile": "tsc -p ./ && sh ./build-panels.sh",
     "watch": "tsc -watch -p ./",
     "pretest": "yarn run compile && yarn run lint",
-    "lint": "eslint",
-    "format:check": "prettier -c .",
-    "format": "prettier -w .",
-    "lint:fix": "eslint --fix",
     "test": "vscode-test",
-    "deploy": "vsce publish --no-yarn"
+    "lint": "eslint",
+    "lint:fix": "eslint --fix",
+    "format": "prettier -c .",
+    "format:fix": "prettier -w ."
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
