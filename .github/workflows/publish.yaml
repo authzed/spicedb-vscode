@@ -1,10 +1,11 @@
+name: 'Publish'
 on:
   release:
     types:
       - published
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -21,7 +22,39 @@ jobs:
           echo Version: $VERSION
           echo "VERSION=$VERSION" >> $GITHUB_ENV
       - run: 'npm version ${VERSION} --no-git-tag-version'
-      - name: Publish
-        run: yarn deploy
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+      - name: Publish to Open VSX Registry
+        uses: HaaLeo/publish-vscode-extension@v2
+        with:
+          yarn: 'false'
+          skipDuplicate: 'true'
+          pat: ${{ secrets.OPEN_VSX_TOKEN }}
+      - name: Publish to Visual Studio Marketplace
+        uses: HaaLeo/publish-vscode-extension@v2
+        with:
+          yarn: 'false'
+          skipDuplicate: 'true'
+          pat: ${{ secrets.VSCE_PAT }}
+          registryUrl: https://marketplace.visualstudio.com/
+      - name: Build VSIX
+        run: yarn run vscode:build
+      - name: Upload VSIX to release
+        uses: actions/upload-artifact@v6
+        with:
+          path: ./spicedb.vsix
+          name: spicedb.vsix
+          if-no-files-found: 'error'
+      - name: 'Notify in Slack if failure'
+        if: '${{ failure() }}'
+        uses: 'slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a' # v2.1.1
+        with:
+          webhook: '${{ secrets.SLACK_BUILDS_WEBHOOK_URL }}'
+          webhook-type: 'incoming-webhook'
+          payload: |
+            text: "VSCode Release failure."
+            blocks:
+              - type: "section"
+                text:
+                  type: "mrkdwn"
+                  text: |
+                    :x: @eng-oss VSCode Release failure. Please take a look.
+                    *Repository:* <${{ github.server_url }}/${{ github.repository }}|${{ github.repository }}>

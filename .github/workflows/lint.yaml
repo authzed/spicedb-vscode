@@ -19,7 +19,7 @@ jobs:
       - name: 'Run typechecking'
         run: 'CI=true yarn run tsc -noEmit'
       - name: 'Run prettier'
-        run: 'CI=true yarn run format:check'
+        run: 'CI=true yarn run format'
       - name: 'Run lint'
         run: 'CI=true yarn run lint'
 

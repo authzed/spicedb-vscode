@@ -1,2 +1,11 @@
+.github
+.idea
+.vscode
+.gitignore
 src/check-watch-panel/node_modules
 !src/check-watch-panel/node_modules/@vscode/codicons/dist
+CODE-OF-CONDUCT.md
+build-panels.sh
+download-wasm.sh
+eslint.config.mjs
+src
