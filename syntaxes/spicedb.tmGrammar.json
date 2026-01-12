@@ -78,8 +78,8 @@
         { "include": "#indirectRelationType" },
         { "include": "#directRelationType" },
         { "include": "#pipe" },
-        { "include": "#with_caveat" },
         { "include": "#with_expiration" },
+        { "include": "#with_caveat" },
         { "include": "#comment" }
       ]
     },
