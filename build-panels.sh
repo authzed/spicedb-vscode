@@ -1,7 +1,7 @@
 set -e
 
 WASM_FILE="src/check-watch-panel/public/main.wasm"
-WASM_URL="https://github.com/authzed/spicedb/releases/download/v1.49.2/development.wasm"
+WASM_URL="https://github.com/authzed/spicedb/releases/download/v1.51.0/development.wasm"
 
 WASM_EXEC_FILE="src/check-watch-panel/public/wasm_exec.js"
 WASM_EXEC_URL="https://raw.githubusercontent.com/golang/go/c61e5e72447b568dd25367f592962c7ebf28b1c7/lib/wasm/wasm_exec.js"

@@ -7,6 +7,8 @@
   "patterns": [
     { "include": "#comment" },
     { "include": "#use" },
+    { "include": "#import" },
+    { "include": "#partial" },
     { "include": "#definition" },
     { "include": "#caveat" },
     { "include": "#relation" },
@@ -285,6 +287,30 @@
         },
         "2": {
           "name": "keyword.class.definition"
+        }
+      }
+    },
+    "import": {
+      "comment": "import",
+      "match": "\\s*(import)\\s*([\"a-zA-Z_]\\w*)\\s*",
+      "captures": {
+        "1": {
+          "name": "keyword.class.definition"
+        },
+        "2": {
+          "name": "entity.name.function"
+        }
+      }
+    },
+    "partial": {
+      "comment": "partial",
+      "match": "\\s*(partial)\\s*([\"a-zA-Z_]\\w*)\\s*",
+      "captures": {
+        "1": {
+          "name": "keyword.class.definition"
+        },
+        "2": {
+          "name": "entity.name.function"
         }
       }
     },

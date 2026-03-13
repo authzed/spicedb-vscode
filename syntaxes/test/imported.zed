@@ -1,0 +1,13 @@
+use partial
+
+definition mycustomtype {}
+
+definition user {}
+
+partial secret {
+    relation secretview: user | mycustomtype
+}
+
+caveat is_raining(day string) {
+    day == "tues" || day == "mon"
+}
