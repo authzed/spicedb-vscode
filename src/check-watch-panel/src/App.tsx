@@ -201,7 +201,7 @@ function App() {
                 {liveCheckService.state.status === LiveCheckStatus.SERVICE_ERROR && (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <i className="codicon codicon-error"></i>
-                    <div style={{ color: 'red' }}>An error occurred while trying to run the checks</div>
+                    <div style={{ color: 'red' }}>An error occurred while trying to run the checks: {liveCheckService.state.serverErr}</div>
                   </div>
                 )}
                 {liveCheckService.state.status === LiveCheckStatus.PARSE_ERROR && (
