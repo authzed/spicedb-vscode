@@ -2,10 +2,12 @@
 .idea
 .vscode
 .gitignore
-src/check-watch-panel/node_modules
-!src/check-watch-panel/node_modules/@vscode/codicons/dist
 CODE-OF-CONDUCT.md
 build-panels.sh
-download-wasm.sh
 eslint.config.mjs
+syntaxes/test
 src
+# the check watches panel build includes: main.js, main.css, main.wasm, wasm_exec.js
+!src/check-watch-panel/build
+src/check-watch-panel/node_modules
+!src/check-watch-panel/node_modules/@vscode/codicons/dist
