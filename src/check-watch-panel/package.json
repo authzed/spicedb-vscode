@@ -33,8 +33,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build && yarn run dist-build",
-    "dist-build": "./dist-build.sh",
+    "build": "react-scripts build && sh dist-build.sh",
     "lint": "eslint --ext .js,.ts && prettier -c .",
     "lint:fix": "eslint --fix --ext .js,.ts && prettier -w .",
     "test": "react-scripts test",

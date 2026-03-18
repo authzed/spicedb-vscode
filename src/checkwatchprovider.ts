@@ -118,8 +118,8 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
   private _getHtmlForWebview(webview: vscode.Webview) {
     const cssUri = getUri(webview, this._extensionUri, ['src', 'check-watch-panel', 'build', 'main.css']);
     const scriptUri = getUri(webview, this._extensionUri, ['src', 'check-watch-panel', 'build', 'main.js']);
-    const goScriptUri = getUri(webview, this._extensionUri, ['src', 'check-watch-panel', 'public', 'wasm_exec.js']);
-    const wasmBundleUri = getUri(webview, this._extensionUri, ['src', 'check-watch-panel', 'public', 'main.wasm']);
+    const goScriptUri = getUri(webview, this._extensionUri, ['src', 'check-watch-panel', 'build', 'wasm_exec.js']);
+    const wasmBundleUri = getUri(webview, this._extensionUri, ['src', 'check-watch-panel', 'build', 'main.wasm']);
 
     // From: https://github.com/microsoft/vscode-extension-samples/blob/main/webview-codicons-sample/src/extension.ts
     const codiconsUri = getUri(webview, this._extensionUri, [

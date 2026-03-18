@@ -136,17 +136,11 @@ function App() {
           )}
           {!!activeSchema && !activeYaml && (
             <div style={{ display: 'block', textAlign: 'left' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <i className="codicon codicon-warning"></i>
-                <div>
-                  No valid relationships file with extension <code>.zed.yaml</code> found matching the schema file{' '}
-                  <code>{activeSchemaPath}</code>
-                </div>
-              </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '20px' }}>
                 <i className="codicon codicon-arrow-circle-right"></i>
                 <div>
-                  To enable the Check Watches panel, please create a YAML file named <code>{activeSchemaPath}.yaml</code>
+                  To enable the Check Watches panel, please create a YAML file named <code>{activeSchemaPath}.yaml</code> and add{' '}
+                  <code>relationships</code> to it.
                 </div>
               </div>
             </div>
@@ -161,7 +155,31 @@ function App() {
           )}
         </>
       )}
-      {isValidFile && hasValidSchemaAndYaml && devService.state.status !== 'ready' && <VSCodeProgressRing />}
+      {isValidFile && hasValidSchemaAndYaml && devService.state.status === 'loading' && <VSCodeProgressRing />}
+      {isValidFile && hasValidSchemaAndYaml && (devService.state.status === 'loaderror' || devService.state.status === 'unsupported') && (
+        <div style={{ display: 'block', textAlign: 'left' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <i className="codicon codicon-error"></i>
+            <div style={{ color: '#FF8488' }}>
+              {devService.state.status === 'unsupported'
+                ? 'WebAssembly is not supported in this environment.'
+                : 'Failed to load the SpiceDB developer WASM module.'}
+            </div>
+          </div>
+          <div style={{ marginTop: '10px' }}>
+            The Check Watches panel requires a WASM binary at <code>src/check-watch-panel/build/main.wasm</code>. To download it, run from
+            the SpiceDB repository:
+          </div>
+          <pre
+            style={{ marginTop: '5px', padding: '8px', backgroundColor: 'var(--vscode-textCodeBlock-background)', whiteSpace: 'pre-wrap' }}
+          >
+            GOOS=js GOARCH=wasm go build -o main.wasm ./cmd/spicedb-wasm
+          </pre>
+          <div>
+            Then copy <code>main.wasm</code> into <code>src/check-watch-panel/build/</code>.
+          </div>
+        </div>
+      )}
       {isValidFile && hasValidSchemaAndYaml && devService.state.status === 'ready' && (
         <div style={{ width: '100%' }}>
           <div style={{ position: 'relative', width: '100%' }}>

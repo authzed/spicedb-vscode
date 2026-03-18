@@ -103,7 +103,6 @@
     "vscode:build": "vsce package -o spicedb.vsix --no-yarn",
     "vscode:prepublish": "yarn run compile",
     "vscode:publish": "vsce publish --no-yarn",
-    "download-wasm": "./download-wasm.sh",
     "compile": "tsc -p ./ && sh ./build-panels.sh",
     "watch": "tsc -watch -p ./",
     "pretest": "yarn run compile && yarn run lint",
