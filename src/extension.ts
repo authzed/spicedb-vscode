@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient/node';
 
-import { type ResolvedReference, Resolver, findReferenceNode, parse } from '@authzed/spicedb-parser-js';
+import { type ResolvedReference, Resolver, parse } from '@authzed/spicedb-parser-js';
 
 import { getInstallCommand, languageServerBinaryPath } from './binary';
 import { CheckWatchProvider } from './checkwatchprovider';
@@ -42,79 +42,6 @@ export function activate(context: vscode.ExtensionContext) {
       }
     }),
   );
-
-  // TODO: Move this into the language server.
-  vscode.languages.registerDefinitionProvider('spicedb', {
-    provideDefinition: function (
-      document: vscode.TextDocument,
-      position: vscode.Position,
-      _token: vscode.CancellationToken,
-    ): vscode.ProviderResult<vscode.Definition> {
-      const text = document.getText();
-      const parserResult = parse(text);
-      if (parserResult.error) {
-        return;
-      }
-
-      // NOTE: the indexes from VSCode are 0-based, but the parser is 1-based.
-      const found = findReferenceNode(parserResult.schema!, position.line + 1, position.character + 1);
-      if (!found) {
-        return;
-      }
-
-      const resolution = new Resolver(parserResult.schema!);
-      switch (found.node?.kind) {
-        case 'typeref': {
-          const def = resolution.lookupDefinition(found.node.path);
-          if (def) {
-            if (found.node.relationName) {
-              const relation = def.lookupRelationOrPermission(found.node.relationName);
-              if (relation) {
-                return {
-                  uri: document.uri,
-                  range: new vscode.Range(
-                    relation.range.startIndex.line - 1,
-                    relation.range.startIndex.column - 1,
-                    relation.range.startIndex.line - 1,
-                    relation.range.startIndex.column - 1,
-                  ),
-                };
-              }
-            } else {
-              return {
-                uri: document.uri,
-                range: new vscode.Range(
-                  def.definition.range.startIndex.line - 1,
-                  def.definition.range.startIndex.column - 1,
-                  def.definition.range.startIndex.line - 1,
-                  def.definition.range.startIndex.column - 1,
-                ),
-              };
-            }
-          }
-          break;
-        }
-
-        case 'relationref': {
-          const relation = resolution.resolveRelationOrPermission(found.node, found.def);
-          if (relation) {
-            return {
-              uri: document.uri,
-              range: new vscode.Range(
-                relation.range.startIndex.line - 1,
-                relation.range.startIndex.column - 1,
-                relation.range.startIndex.line - 1,
-                relation.range.startIndex.column - 1,
-              ),
-            };
-          }
-          break;
-        }
-      }
-
-      return undefined;
-    },
-  });
 
   // TODO: Move this into the language server.
   vscode.languages.registerDocumentSemanticTokensProvider(

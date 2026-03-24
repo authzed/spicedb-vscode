@@ -1,11 +1,15 @@
 // this is a standard schema that should have every available feature (wildcards, caveats, etc)
 use expiration
+use partial
+use import
 
-definition user {}
+import "imported.zed"
 
 definition group {
-	relation member: user with non_expired_grant | user with expiration
+	relation member: user with is_raining | user with expiration
 	relation member2: user:* with non_expired_grant
+	...secret
+	permission supersecret = secretview // defined in the partial
 }
 
 definition document {
@@ -15,7 +19,7 @@ definition document {
 	relation bbb: user:*
 	relation ccc: user:*
 	relation ddd: user:*
-
+	...view_secret
 
 	// a comment
 	permission view = aaa
@@ -33,4 +37,8 @@ definition document {
 
 caveat non_expired_grant(name string, description string) {
   name.matches("-$test") || size(description) >= 100
+}
+
+partial view_secret {
+	relation secret: user
 }

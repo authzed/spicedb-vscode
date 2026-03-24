@@ -87,6 +87,16 @@
         "icon": "$(watch-expressions-add)"
       }
     ],
+    "configuration": {
+      "title": "SpiceDB",
+      "properties": {
+        "spicedb.binaryPath": {
+          "type": "string",
+          "default": "/Users/user/Documents/GitHub/spicedb/dist/main",
+          "description": "Absolute path to a custom SpiceDB binary. If empty, the extension will look for 'spicedb' on your PATH."
+        }
+      }
+    },
     "menus": {
       "view/title": [
         {
