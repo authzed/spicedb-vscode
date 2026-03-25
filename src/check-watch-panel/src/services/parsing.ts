@@ -1,17 +1,17 @@
 import { ContextualizedCaveat, RelationTuple as Relationship } from './protodevdefs/core/v1/core';
 import { Struct } from './protodevdefs/google/protobuf/struct';
 
-export const CAVEAT_NAME_EXPR = '([a-z][a-z0-9_]{1,61}[a-z0-9]/)?[a-z][a-z0-9_]{1,62}[a-z0-9]';
+export const CAVEAT_NAME_EXPR = '([a-z_][a-z0-9_]{1,61}[a-z0-9]/)?[a-z_][a-z0-9_]{1,62}[a-z0-9]';
 
 const CAVEAT_REGEX = new RegExp(`\\[(?<caveat_name>(${CAVEAT_NAME_EXPR}))(:(?<caveat_context>(\\{(.+)\\})))?\\]`);
 
 const OBJECT_AND_RELATION_REGEX = /(?<namespace>[^:]+):(?<object_id>[^#]+)#(?<relation>[^@]+)/;
 const SUBJECT_REGEX = /(?<namespace>[^:]+):(?<object_id>[^#]+)(#(?<relation>[^@[]+))?/;
 
-export const NAMESPACE_REGEX = /^([a-z][a-z0-9_]{1,61}[a-z0-9]\/)*[a-z][a-z0-9_]{1,62}[a-z0-9]$/;
+export const NAMESPACE_REGEX = /^([a-z_][a-z0-9_]{1,61}[a-z0-9]\/)*[a-z_][a-z0-9_]{1,62}[a-z0-9]$/;
 export const RESOURCE_ID_REGEX = /^([a-zA-Z0-9/_|\-=+]{1,1024})$/;
 export const SUBJECT_ID_REGEX = /^(([a-zA-Z0-9/_|\-=+]{1,1024})|\*)$/;
-export const RELATION_REGEX = /^(\.\.\.|[a-z][a-z0-9_]{1,62}[a-z0-9])$/;
+export const RELATION_REGEX = /^(\.\.\.|[a-z_][a-z0-9_]{1,62}[a-z0-9])$/;
 
 export const maxObjectIDLength = 1024;
 
