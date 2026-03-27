@@ -29,7 +29,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.workspace.onDidChangeTextDocument((e: vscode.TextDocumentChangeEvent) => {
-      if (e.document.uri.fsPath.endsWith('.zed')) {
+      if (e.document.uri.fsPath.endsWith('.zed') || e.document.languageId === 'spicedb') {
         if (vscode.window.activeTextEditor?.document.uri.fsPath === e.document.uri.fsPath) {
           checkWatchProvider.setActiveSchema(e.document.uri.fsPath, e.document.getText());
         }

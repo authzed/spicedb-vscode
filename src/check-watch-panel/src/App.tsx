@@ -14,6 +14,7 @@ function App() {
   }, []);
 
   const [activeFilePath, setActiveFilePath] = useState<string | undefined>((window as any).ACTIVE_FILE_PATH);
+  const [activeLanguageId, setActiveLanguageId] = useState<string | undefined>((window as any).ACTIVE_LANGUAGE_ID);
 
   const [activeSchemaPath, setActiveSchemaPath] = useState<string | null>(null);
   const [activeSchema, setActiveSchema] = useState<string | null>(null);
@@ -76,6 +77,7 @@ function App() {
 
         case 'activeFile':
           setActiveFilePath(message.filePath);
+          setActiveLanguageId(message.languageId);
       }
     };
 
@@ -110,7 +112,8 @@ function App() {
     liveCheckService.itemUpdated(item);
   };
 
-  const isValidFile = !!activeFilePath && (activeFilePath.endsWith('.zed') || activeFilePath.endsWith('.zed.yaml'));
+  const isValidFile =
+    !!activeFilePath && (activeFilePath.endsWith('.zed') || activeFilePath.endsWith('.zed.yaml') || activeLanguageId === 'spicedb');
   const hasValidSchemaAndYaml = !!activeSchema && !!activeYaml && !yamlIssue;
 
   return (

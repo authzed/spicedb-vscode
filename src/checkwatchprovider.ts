@@ -29,7 +29,8 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
         case 'ready':
           if (
             vscode.window.activeTextEditor?.document.uri.fsPath.endsWith('.zed') ||
-            vscode.window.activeTextEditor?.document.uri.fsPath.endsWith('.zed.yaml')
+            vscode.window.activeTextEditor?.document.uri.fsPath.endsWith('.zed.yaml') ||
+            vscode.window.activeTextEditor?.document.languageId === 'spicedb'
           ) {
             this.performUpdate(vscode.window.activeTextEditor?.document.uri.fsPath);
           }
@@ -52,6 +53,8 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
     } else if (fsPath.endsWith('.yaml')) {
       yamlContentsPath = fsPath;
       schemaContentsPath = fsPath.replace('.yaml', '');
+    } else if (vscode.window.activeTextEditor?.document.languageId === 'spicedb') {
+      schemaContentsPath = fsPath;
     }
 
     let schemaContents = '';
@@ -91,7 +94,8 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
 
   public setActiveFile(filePath: string | undefined) {
     if (this._view) {
-      this._view.webview.postMessage({ type: 'activeFile', filePath });
+      const languageId = vscode.window.activeTextEditor?.document.languageId;
+      this._view.webview.postMessage({ type: 'activeFile', filePath, languageId });
     }
   }
 
@@ -133,6 +137,7 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
 
     const nonce = getNonce();
     const activeFilePath = vscode.window.activeTextEditor?.document.uri.fsPath ?? '';
+    const activeLanguageId = vscode.window.activeTextEditor?.document.languageId ?? '';
 
     return `<!DOCTYPE html>
 			<html lang="en">
@@ -145,6 +150,7 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
 				<script>
 					window.WASM_BUNDLE_URI = '${wasmBundleUri}';
 					window.ACTIVE_FILE_PATH = '${activeFilePath}';
+					window.ACTIVE_LANGUAGE_ID = '${activeLanguageId}';
 				</script>
                 <script src="${goScriptUri}"></script>
 			</head>
