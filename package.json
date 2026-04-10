@@ -29,6 +29,18 @@
         ]
       },
       {
+        "id": "spicedb-yaml",
+        "aliases": [
+          "SpiceDB YAML"
+        ],
+        "extensions": [
+          ".zed.yaml"
+        ],
+        "filenamePatterns": [
+          "*.zed.yaml"
+        ]
+      },
+      {
         "id": "spicedb",
         "aliases": [
           "SpiceDB",
@@ -51,6 +63,24 @@
         "language": "cel",
         "scopeName": "source.cel",
         "path": "./syntaxes/cel.tmGrammar.json"
+      },
+      {
+        "language": "spicedb-yaml",
+        "scopeName": "source.spicedb-yaml",
+        "path": "./syntaxes/spicedb-yaml.tmGrammar.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.spicedb": "spicedb"
+        }
+      },
+      {
+        "scopeName": "spicedb-yaml.injection",
+        "path": "./syntaxes/spicedb-yaml-injection.tmGrammar.json",
+        "injectTo": [
+          "source.spicedb-yaml"
+        ],
+        "embeddedLanguages": {
+          "meta.embedded.block.spicedb": "spicedb"
+        }
       },
       {
         "language": "spicedb",
@@ -104,9 +134,16 @@
           "when": "view == spicedb.checkWatchView"
         }
       ]
+    },
+    "configurationDefaults": {
+      "files.associations": {
+        "*.zed.yaml": "spicedb-yaml"
+      }
     }
   },
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./out/extension.js",
   "scripts": {
     "vscode:build": "vsce package -o spicedb.vsix --no-yarn",

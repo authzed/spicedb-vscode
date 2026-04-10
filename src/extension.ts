@@ -6,8 +6,18 @@ import { type ResolvedReference, Resolver, parse } from '@authzed/spicedb-parser
 import { checkSpicedbVersion, getInstallCommand, languageServerBinaryPath } from './binary';
 import { CheckWatchProvider } from './checkwatchprovider';
 
+function reassignZedYamlLanguage(doc: vscode.TextDocument) {
+  if (doc.fileName.endsWith('.zed.yaml') && doc.languageId !== 'spicedb-yaml') {
+    vscode.languages.setTextDocumentLanguage(doc, 'spicedb-yaml');
+  }
+}
+
 export function activate(context: vscode.ExtensionContext) {
   console.log('spicedb-vscode is now active');
+
+  // Reassign language for any already-open .zed.yaml files detected as plain yaml
+  vscode.workspace.textDocuments.forEach(reassignZedYamlLanguage);
+  context.subscriptions.push(vscode.workspace.onDidOpenTextDocument(reassignZedYamlLanguage));
 
   const checkWatchProvider = new CheckWatchProvider(context.extensionUri);
 
@@ -199,9 +209,12 @@ async function startLanguageServer(context: vscode.ExtensionContext) {
   };
 
   const clientOptions: LanguageClientOptions = {
-    documentSelector: [{ scheme: 'file', language: 'spicedb' }],
+    documentSelector: [
+      { scheme: 'file', language: 'spicedb' },
+      { scheme: 'file', language: 'spicedb-yaml' },
+    ],
     synchronize: {
-      fileEvents: vscode.workspace.createFileSystemWatcher('**/.zed'),
+      fileEvents: vscode.workspace.createFileSystemWatcher('**/*.zed{,.yaml}'),
     },
   };
 
