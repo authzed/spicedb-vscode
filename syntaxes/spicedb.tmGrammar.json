@@ -62,7 +62,7 @@
     },
     "relation": {
       "comment": "definition of a relation",
-      "begin": "(\\brelation\\b)\\s+([a-zA-Z_]\\w*)\\s*(\\:)",
+      "begin": "(\\brelation\\b)\\s+([a-zA-Z_]\\w*)\\s*(:)",
       "beginCaptures": {
         "1": {
           "name": "keyword.variable.relation"
@@ -74,7 +74,7 @@
           "name": "punctuation.definition.colon"
         }
       },
-      "end": "(?<=\\;|\\n)",
+      "end": "(?<=;|\\n)",
       "patterns": [
         { "include": "#wildcardRelationType" },
         { "include": "#indirectRelationType" },
@@ -92,7 +92,7 @@
     },
     "wildcardRelationType": {
       "comment": "wildcard relation type",
-      "match": "([a-zA-Z_]\\w*)(\\:)(\\*)",
+      "match": "([a-zA-Z_]\\w*)(:)(\\*)",
       "captures": {
         "1": {
           "name": "entity.name.class"
@@ -143,7 +143,7 @@
           "name": "punctuation.definition.equal"
         }
       },
-      "end": "(?<=\\;|\\n)",
+      "end": "(?<=;|\\n)",
       "patterns": [
         { "include": "#comment" },
         { "include": "#arrow_alternative" },
@@ -174,7 +174,7 @@
     },
     "permissionOperator": {
       "comment": "permission operator",
-      "match": "\\s*(\\+|\\-|\\&)\\s*",
+      "match": "\\s*(\\+|-|&)\\s*",
       "captures": {
         "1": {
           "name": "keyword.operator.logical"
@@ -183,7 +183,7 @@
     },
     "arrow": {
       "comment": "arrow",
-      "match": "\\s*([a-zA-Z_]\\w*)(\\-\\>)([a-zA-Z_]\\w*)\\s*",
+      "match": "\\s*([a-zA-Z_]\\w*)(->)([a-zA-Z_]\\w*)\\s*",
       "captures": {
         "1": {
           "name": "entity.name.variable"
@@ -275,7 +275,7 @@
     },
     "comma": {
       "comment": "comma",
-      "match": "\\s*\\,\\s*",
+      "match": "\\s*,\\s*",
       "name": "punctuation.definition.comma"
     },
     "use": {
