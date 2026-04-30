@@ -299,7 +299,7 @@
         },
         {
           "name": "keyword.operator.arithmetic.cel",
-          "match": "(\\+|\\-|\\*|\\/|\\%|\\!)"
+          "match": "(\\+|-|\\*|\\/|%|!)"
         }
       ]
     }
