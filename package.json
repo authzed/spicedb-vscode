@@ -127,6 +127,7 @@
     "@trivago/prettier-plugin-sort-imports": "^6.0.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "24.10.1",
+    "@types/semver": "^7.7.1",
     "@types/vscode": "^1.106.1",
     "@typescript-eslint/eslint-plugin": "^8.48.1",
     "@typescript-eslint/parser": "^8.48.1",
@@ -143,6 +144,7 @@
     "@types/parsimmon": "^1.10.9",
     "command-exists": "^1.2.9",
     "parsimmon": "^1.18.1",
+    "semver": "^7.7.4",
     "vscode-languageclient": "^9.0.1"
   }
 }

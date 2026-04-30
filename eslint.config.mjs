@@ -41,5 +41,5 @@ export default defineConfig([
       '@typescript-eslint/no-non-null-assertion': 0,
     },
   },
-  globalIgnores(['src/check-watch-panel', 'out']),
+  globalIgnores(['src/check-watch-panel', 'out', '.vscode-test', 'build']),
 ]);
