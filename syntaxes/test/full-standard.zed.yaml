@@ -1,0 +1,14 @@
+---
+schema: |-
+  definition user {}
+  definition doc {
+    relation vieww: user
+    relation blah: user
+    }
+
+assertions:
+  assertTrue:
+    - 'doc:1#admin@user:maria'
+
+relationships: |-
+  doc:1#vieww@user:maria
