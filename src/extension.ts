@@ -3,7 +3,7 @@ import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } f
 
 import { type ResolvedReference, Resolver, parse } from '@authzed/spicedb-parser-js';
 
-import { getInstallCommand, languageServerBinaryPath } from './binary';
+import { checkSpicedbVersion, getInstallCommand, languageServerBinaryPath } from './binary';
 import { CheckWatchProvider } from './checkwatchprovider';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -182,6 +182,8 @@ async function startLanguageServer(context: vscode.ExtensionContext) {
     console.error('Failed to find the SpiceDB language server binary');
     return;
   }
+
+  checkSpicedbVersion(serverBinary);
 
   const serverOptions: ServerOptions = {
     run: {
