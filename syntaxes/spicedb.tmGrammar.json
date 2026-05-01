@@ -165,7 +165,7 @@
     },
     "relationRef": {
       "comment": "relation reference",
-      "match": "([a-zA-Z_]\\w*)",
+      "match": "([a-zA-Z_]\\w*)\\b(?!->|\\.(?:any|all)\\()",
       "captures": {
         "1": {
           "name": "entity.name.variable"
