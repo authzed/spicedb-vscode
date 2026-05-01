@@ -19,15 +19,11 @@
       "patterns": [{ "include": "#lineComment" }, { "include": "#blockComment" }],
       "repository": {
         "lineComment": {
-          "patterns": [{ "include": "#doubleSlashLineComment" }, { "include": "#slashDotLineComment" }],
+          "patterns": [{ "include": "#doubleSlashLineComment" }],
           "repository": {
             "doubleSlashLineComment": {
               "match": "\\/\\/.*",
               "name": "comment.line.double-slash.spicedb"
-            },
-            "slashDotLineComment": {
-              "match": "\\/\\*.*\\*\\/",
-              "name": "comment.line.spicedb"
             }
           }
         },
