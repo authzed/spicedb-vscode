@@ -131,7 +131,7 @@
     },
     "permission": {
       "comment": "definition of a permission",
-      "begin": "(permission\\b)\\s+([a-zA-Z_]\\w*)\\s*(=)\\s*",
+      "begin": "(\\bpermission\\b)\\s+([a-zA-Z_]\\w*)\\s*(=)\\s*",
       "beginCaptures": {
         "1": {
           "name": "keyword.function.relation"
