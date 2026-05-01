@@ -127,7 +127,7 @@
     },
     "permission": {
       "comment": "definition of a permission",
-      "begin": "(permission\\b)\\s+([a-zA-Z_]\\w*)\\s*(=)\\s*",
+      "begin": "(\\bpermission\\b)\\s+([a-zA-Z_]\\w*)\\s*(=)\\s*",
       "beginCaptures": {
         "1": {
           "name": "keyword.function.relation"
@@ -161,7 +161,7 @@
     },
     "relationRef": {
       "comment": "relation reference",
-      "match": "([a-zA-Z_]\\w*)",
+      "match": "([a-zA-Z_]\\w*)\\b(?!->|\\.(?:any|all)\\()",
       "captures": {
         "1": {
           "name": "entity.name.variable"
