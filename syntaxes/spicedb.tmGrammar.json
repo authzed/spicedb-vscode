@@ -40,7 +40,7 @@
     },
     "definition": {
       "comment": "definition of a resource type in schema",
-      "begin": "(\\bdefinition\\b)\\s+(([a-z][\\w]{1,62}[a-z0-9]\\/)*[a-z][\\w]{1,62}[a-z0-9])\\s*(\\{)",
+      "begin": "(\\bdefinition\\b)\\s+(([a-z_][\\w]{1,62}[a-z0-9]\\/)*[a-z_][\\w]{1,62}[a-z0-9])\\s*(\\{)",
       "beginCaptures": {
         "1": {
           "name": "keyword.class.definition"
@@ -229,7 +229,7 @@
     "caveat": {
       "comment": "caveat in schema",
       "name": "meta.embedded.block.cel",
-      "begin": "(\\bcaveat\\b)\\s+(([a-z][\\w]{1,62}[a-z0-9]\\/)*[a-z][\\w]{1,62}[a-z0-9])\\s*\\(([^\\)]*)\\)\\s*(\\{)",
+      "begin": "(\\bcaveat\\b)\\s+(([a-z_][\\w]{1,62}[a-z0-9]\\/)*[a-z_][\\w]{1,62}[a-z0-9])\\s*\\(([^\\)]*)\\)\\s*(\\{)",
       "beginCaptures": {
         "1": {
           "name": "keyword.function.definition"
@@ -316,7 +316,7 @@
     },
     "with_caveat": {
       "comment": "with_caveat",
-      "match": "\\s*(with)\\s*(([a-z][\\w]{1,62}[a-z0-9]\\/)*[a-z][\\w]{1,62}[a-z0-9])\\s*",
+      "match": "\\s*(with)\\s*(([a-z_][\\w]{1,62}[a-z0-9]\\/)*[a-z_][\\w]{1,62}[a-z0-9])\\s*",
       "captures": {
         "1": {
           "name": "keyword.class.definition"
