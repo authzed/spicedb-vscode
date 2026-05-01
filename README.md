@@ -1,6 +1,6 @@
 # SpiceDB for Visual Studio Code
 
-<a href="https://marketplace.visualstudio.com/items?itemName=authzed.spicedb-vscode"><img src="https://img.shields.io/visual-studio-marketplace/v/authzed.spicedb-vscode?style=flat-square" alt="Visual Studio Marketplace"></a>
+<a href="https://open-vsx.org/extension/authzed/spicedb-vscode"><img src="https://img.shields.io/open-vsx/v/authzed/spicedb-vscode" alt="Open VSX"></a>
 <a href="https://discord.gg/spicedb"><img alt="discord badge" src="https://img.shields.io/badge/discord-spicedb-7289da?style=flat-square"></a>
 <a href="https://twitter.com/authzed"><img alt="twitter badge" src="https://img.shields.io/badge/twitter-@authzed-1d9bf0.svg?style=flat-square"></a>
 <a href="https://www.linkedin.com/company/authzed/"><img alt="linkedin badge" src="https://img.shields.io/badge/linkedin-+authzed-2D65BC.svg?style=flat-square"></a>
