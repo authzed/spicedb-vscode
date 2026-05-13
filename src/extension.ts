@@ -5,6 +5,7 @@ import { type ResolvedReference, Resolver, parse } from '@authzed/spicedb-parser
 
 import { checkSpicedbVersion, getInstallCommand, languageServerBinaryPath } from './binary';
 import { CheckWatchProvider } from './checkwatchprovider';
+import { isSpiceDbDocument } from './spicedbDocument';
 
 function reassignZedYamlLanguage(doc: vscode.TextDocument) {
   if (doc.fileName.endsWith('.zed.yaml') && doc.languageId !== 'spicedb-yaml') {
@@ -31,7 +32,11 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.window.onDidChangeActiveTextEditor((editor) => {
-      if (editor) {
+      if (!editor) return;
+      // Only refresh the panel for SpiceDB-related files; switching to an
+      // unrelated tab (e.g. a Markdown file) used to wipe the panel back to
+      // its empty state and hide the active watches.
+      if (isSpiceDbDocument(editor.document.uri.fsPath, editor.document.languageId)) {
         checkWatchProvider.performUpdate(editor.document.uri.fsPath);
       }
     }),
