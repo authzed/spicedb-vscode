@@ -1,24 +1,52 @@
 {
   "name": "spicedb-vscode",
   "displayName": "SpiceDB VSCode",
-  "description": "VSCode Extension for working with SpiceDB",
-  "publisher": "authzed",
   "version": "1.2.0",
-  "icon": "icons/authzed-icon-multi-128x128.png",
+  "description": "VSCode Extension for working with SpiceDB",
+  "categories": [
+    "Other"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/authzed/spicedb-vscode.git"
   },
-  "engines": {
-    "vscode": "^1.106.1"
+  "publisher": "authzed",
+  "main": "./out/extension.js",
+  "scripts": {
+    "vscode:build": "pnpm vsce package -o spicedb.vsix --no-yarn",
+    "vscode:prepublish": "pnpm run compile",
+    "vscode:publish": "pnpm vsce publish --no-yarn",
+    "compile": "sh ./build-panels.sh",
+    "watch": "pnpm tsc -watch -p ./",
+    "pretest": "pnpm run compile && yarn run lint",
+    "test": "pnpm vscode-test",
+    "lint": "pnpm oxlint -c oxlint.config.mts",
+    "lint:fix": "pnpm oxlint -c oxlint.config.mts --fix",
+    "format": "pnpm oxfmt",
+    "format:check": "pnpm oxfmt --check"
   },
-  "extensionKind": [
-    "ui",
-    "workspace"
-  ],
-  "categories": [
-    "Other"
-  ],
+  "dependencies": {
+    "@authzed/spicedb-parser-js": "^1.0.5",
+    "@types/command-exists": "^1.2.3",
+    "@types/parsimmon": "^1.10.9",
+    "command-exists": "^1.2.9",
+    "parsimmon": "^1.18.1",
+    "semver": "^7.7.4",
+    "vscode-languageclient": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "24.10.1",
+    "@types/semver": "^7.7.1",
+    "@types/vscode": "^1.106.1",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2",
+    "@vscode/vsce": "^3.7.1",
+    "oxfmt": "^0.49.0",
+    "oxlint": "^1.64.0",
+    "oxlint-tsgolint": "^0.22.1",
+    "typescript": "^5.9.3"
+  },
   "contributes": {
     "languages": [
       {
@@ -144,41 +172,13 @@
   "activationEvents": [
     "onStartupFinished"
   ],
-  "main": "./out/extension.js",
-  "scripts": {
-    "vscode:build": "pnpm vsce package -o spicedb.vsix --no-yarn",
-    "vscode:prepublish": "pnpm run compile",
-    "vscode:publish": "pnpm vsce publish --no-yarn",
-    "compile": "sh ./build-panels.sh",
-    "watch": "pnpm tsc -watch -p ./",
-    "pretest": "pnpm run compile && yarn run lint",
-    "test": "pnpm vscode-test",
-    "lint": "pnpm oxlint",
-    "lint:fix": "pnpm oxlint --fix",
-    "format": "pnpm run oxfmt --check",
-    "format:fix": "pnpm run oxfmtl"
-  },
-  "devDependencies": {
-    "@types/mocha": "^10.0.10",
-    "@types/node": "24.10.1",
-    "@types/semver": "^7.7.1",
-    "@types/vscode": "^1.106.1",
-    "@vscode/test-cli": "^0.0.12",
-    "@vscode/test-electron": "^2.5.2",
-    "@vscode/vsce": "^3.7.1",
-    "oxfmt": "^0.49.0",
-    "oxlint": "^1.64.0",
-    "oxlint-tsgolint": "^0.22.1",
-    "typescript": "^5.9.3"
-  },
-  "dependencies": {
-    "@authzed/spicedb-parser-js": "^1.0.5",
-    "@types/command-exists": "^1.2.3",
-    "@types/parsimmon": "^1.10.9",
-    "command-exists": "^1.2.9",
-    "parsimmon": "^1.18.1",
-    "semver": "^7.7.4",
-    "vscode-languageclient": "^9.0.1"
+  "extensionKind": [
+    "ui",
+    "workspace"
+  ],
+  "icon": "icons/authzed-icon-multi-128x128.png",
+  "engines": {
+    "vscode": "^1.106.1"
   },
   "packageManager": "pnpm@11.1.1"
 }

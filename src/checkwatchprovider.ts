@@ -1,15 +1,15 @@
-import * as vscode from 'vscode';
-import { Uri, Webview } from 'vscode';
+import * as vscode from "vscode";
+import { Uri, Webview } from "vscode";
 
-import fs from 'fs';
-import fsp from 'fs/promises';
+import fs from "fs";
+import fsp from "fs/promises";
 
 function getUri(webview: Webview, extensionUri: Uri, pathList: string[]) {
   return webview.asWebviewUri(Uri.joinPath(extensionUri, ...pathList));
 }
 
 export class CheckWatchProvider implements vscode.WebviewViewProvider {
-  public static readonly viewType = 'spicedb.checkWatchView';
+  public static readonly viewType = "spicedb.checkWatchView";
 
   private _view?: vscode.WebviewView;
 
@@ -26,11 +26,11 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.onDidReceiveMessage((data) => {
       switch (data.type) {
-        case 'ready':
+        case "ready":
           if (
-            vscode.window.activeTextEditor?.document.uri.fsPath.endsWith('.zed') ||
-            vscode.window.activeTextEditor?.document.uri.fsPath.endsWith('.zed.yaml') ||
-            vscode.window.activeTextEditor?.document.languageId === 'spicedb'
+            vscode.window.activeTextEditor?.document.uri.fsPath.endsWith(".zed") ||
+            vscode.window.activeTextEditor?.document.uri.fsPath.endsWith(".zed.yaml") ||
+            vscode.window.activeTextEditor?.document.languageId === "spicedb"
           ) {
             void this.performUpdate(vscode.window.activeTextEditor?.document.uri.fsPath);
           }
@@ -44,25 +44,25 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
   public async performUpdate(fsPath: string) {
     this.setActiveFile(fsPath);
 
-    let schemaContentsPath = '';
-    let yamlContentsPath = '';
+    let schemaContentsPath = "";
+    let yamlContentsPath = "";
 
-    if (fsPath.endsWith('.zed')) {
+    if (fsPath.endsWith(".zed")) {
       schemaContentsPath = fsPath;
-      yamlContentsPath = fsPath + '.yaml';
-    } else if (fsPath.endsWith('.yaml')) {
+      yamlContentsPath = fsPath + ".yaml";
+    } else if (fsPath.endsWith(".yaml")) {
       yamlContentsPath = fsPath;
-      schemaContentsPath = fsPath.replace('.yaml', '');
-    } else if (vscode.window.activeTextEditor?.document.languageId === 'spicedb') {
+      schemaContentsPath = fsPath.replace(".yaml", "");
+    } else if (vscode.window.activeTextEditor?.document.languageId === "spicedb") {
       schemaContentsPath = fsPath;
     }
 
-    let schemaContents = '';
-    let yamlContents = '';
+    let schemaContents = "";
+    let yamlContents = "";
 
     if (schemaContentsPath && fs.existsSync(schemaContentsPath)) {
       try {
-        schemaContents = await fsp.readFile(schemaContentsPath, 'utf8');
+        schemaContents = await fsp.readFile(schemaContentsPath, "utf8");
         this.setActiveSchema(schemaContentsPath, schemaContents);
       } catch (e) {
         console.error(`Error reading schema file at ${schemaContentsPath}:`, e);
@@ -74,7 +74,7 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
 
     if (yamlContentsPath && fs.existsSync(yamlContentsPath)) {
       try {
-        yamlContents = await fsp.readFile(yamlContentsPath, 'utf8');
+        yamlContents = await fsp.readFile(yamlContentsPath, "utf8");
         this.setActiveYaml(yamlContentsPath, yamlContents);
       } catch (e) {
         console.error(`Error reading YAML file at ${yamlContentsPath}:`, e);
@@ -88,21 +88,21 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
   public addWatch() {
     if (this._view) {
       this._view.show?.(true);
-      this._view.webview.postMessage({ type: 'addWatch' });
+      this._view.webview.postMessage({ type: "addWatch" });
     }
   }
 
   public setActiveFile(filePath: string | undefined) {
     if (this._view) {
       const languageId = vscode.window.activeTextEditor?.document.languageId;
-      this._view.webview.postMessage({ type: 'activeFile', filePath, languageId });
+      this._view.webview.postMessage({ type: "activeFile", filePath, languageId });
     }
   }
 
   public setActiveSchema(filename: string | null, schema: string | null) {
     if (this._view) {
       this._view.webview.postMessage({
-        type: 'schema',
+        type: "schema",
         filename,
         schema,
       });
@@ -112,7 +112,7 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
   public setActiveYaml(filename: string | null, yaml: string | null) {
     if (this._view) {
       this._view.webview.postMessage({
-        type: 'yaml',
+        type: "yaml",
         filename,
         yaml,
       });
@@ -120,24 +120,44 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
   }
 
   private _getHtmlForWebview(webview: vscode.Webview) {
-    const cssUri = getUri(webview, this._extensionUri, ['src', 'check-watch-panel', 'build', 'main.css']);
-    const scriptUri = getUri(webview, this._extensionUri, ['src', 'check-watch-panel', 'build', 'main.js']);
-    const goScriptUri = getUri(webview, this._extensionUri, ['src', 'check-watch-panel', 'build', 'wasm_exec.js']);
-    const wasmBundleUri = getUri(webview, this._extensionUri, ['src', 'check-watch-panel', 'build', 'main.wasm']);
+    const cssUri = getUri(webview, this._extensionUri, [
+      "src",
+      "check-watch-panel",
+      "build",
+      "main.css",
+    ]);
+    const scriptUri = getUri(webview, this._extensionUri, [
+      "src",
+      "check-watch-panel",
+      "build",
+      "main.js",
+    ]);
+    const goScriptUri = getUri(webview, this._extensionUri, [
+      "src",
+      "check-watch-panel",
+      "build",
+      "wasm_exec.js",
+    ]);
+    const wasmBundleUri = getUri(webview, this._extensionUri, [
+      "src",
+      "check-watch-panel",
+      "build",
+      "main.wasm",
+    ]);
 
     // From: https://github.com/microsoft/vscode-extension-samples/blob/main/webview-codicons-sample/src/extension.ts
     const codiconsUri = getUri(webview, this._extensionUri, [
-      'src',
-      'check-watch-panel',
-      'node_modules',
-      '@vscode/codicons',
-      'dist',
-      'codicon.css',
+      "src",
+      "check-watch-panel",
+      "node_modules",
+      "@vscode/codicons",
+      "dist",
+      "codicon.css",
     ]);
 
     const nonce = getNonce();
-    const activeFilePath = vscode.window.activeTextEditor?.document.uri.fsPath ?? '';
-    const activeLanguageId = vscode.window.activeTextEditor?.document.languageId ?? '';
+    const activeFilePath = vscode.window.activeTextEditor?.document.uri.fsPath ?? "";
+    const activeLanguageId = vscode.window.activeTextEditor?.document.languageId ?? "";
 
     return `<!DOCTYPE html>
 			<html lang="en">
@@ -163,8 +183,8 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
 }
 
 function getNonce() {
-  let text = '';
-  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let text = "";
+  const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   for (let i = 0; i < 32; i++) {
     text += possible.charAt(Math.floor(Math.random() * possible.length));
   }

@@ -54,7 +54,11 @@
           "name": "punctuation.end.brace"
         }
       },
-      "patterns": [{ "include": "#relation" }, { "include": "#permission" }, { "include": "#comment" }]
+      "patterns": [
+        { "include": "#relation" },
+        { "include": "#permission" },
+        { "include": "#comment" }
+      ]
     },
     "relation": {
       "comment": "definition of a relation",
@@ -234,7 +238,11 @@
           "name": "entity.name.function"
         },
         "4": {
-          "patterns": [{ "include": "#caveatParameter" }, { "include": "#caveatTypeName" }, { "include": "#comma" }]
+          "patterns": [
+            { "include": "#caveatParameter" },
+            { "include": "#caveatTypeName" },
+            { "include": "#comma" }
+          ]
         },
         "5": {
           "name": "punctuation.definition.brace"

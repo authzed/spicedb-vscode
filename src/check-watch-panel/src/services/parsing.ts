@@ -1,9 +1,11 @@
-import { ContextualizedCaveat, RelationTuple as Relationship } from './protodevdefs/core/v1/core';
-import { Struct } from './protodevdefs/google/protobuf/struct';
+import { ContextualizedCaveat, RelationTuple as Relationship } from "./protodevdefs/core/v1/core";
+import { Struct } from "./protodevdefs/google/protobuf/struct";
 
-export const CAVEAT_NAME_EXPR = '([a-z][a-z0-9_]{1,61}[a-z0-9]/)?[a-z][a-z0-9_]{1,62}[a-z0-9]';
+export const CAVEAT_NAME_EXPR = "([a-z][a-z0-9_]{1,61}[a-z0-9]/)?[a-z][a-z0-9_]{1,62}[a-z0-9]";
 
-const CAVEAT_REGEX = new RegExp(`\\[(?<caveat_name>(${CAVEAT_NAME_EXPR}))(:(?<caveat_context>(\\{(.+)\\})))?\\]`);
+const CAVEAT_REGEX = new RegExp(
+  `\\[(?<caveat_name>(${CAVEAT_NAME_EXPR}))(:(?<caveat_context>(\\{(.+)\\})))?\\]`,
+);
 
 const OBJECT_AND_RELATION_REGEX = /(?<namespace>[^:]+):(?<object_id>[^#]+)#(?<relation>[^@]+)/;
 const SUBJECT_REGEX = /(?<namespace>[^:]+):(?<object_id>[^#]+)(#(?<relation>[^@[]+))?/;
@@ -56,7 +58,7 @@ export interface ParseRelationshipError {
  */
 export const parseRelationship = (value: string): Relationship | undefined => {
   const parsed = parseRelationshipWithError(value);
-  if ('errorMessage' in parsed) {
+  if ("errorMessage" in parsed) {
     return undefined;
   }
 
@@ -67,33 +69,35 @@ export const parseRelationship = (value: string): Relationship | undefined => {
  * parseRelationshipWithError parses a single relationship into a Relationship and returns it or the error
  * if failed to parse.
  */
-export const parseRelationshipWithError = (value: string): Relationship | ParseRelationshipError => {
+export const parseRelationshipWithError = (
+  value: string,
+): Relationship | ParseRelationshipError => {
   const trimmed = value.trim();
-  const pieces = trimmed.split('@');
+  const pieces = trimmed.split("@");
   if (pieces.length <= 1) {
-    return { errorMessage: 'Relationship missing a subject' };
+    return { errorMessage: "Relationship missing a subject" };
   }
 
   if (pieces.length < 2) {
     return {
-      errorMessage: 'Relationship must be of the form `resource@subject`',
+      errorMessage: "Relationship must be of the form `resource@subject`",
     };
   }
 
   const resourceString = pieces[0];
   // Add back any '@' characters that may have been in the caveat context
-  let subjectString = pieces.slice(1).join('@');
-  let caveatString = '';
-  if (subjectString.endsWith(']')) {
-    const subjectPieces = subjectString.split('[');
+  let subjectString = pieces.slice(1).join("@");
+  let caveatString = "";
+  if (subjectString.endsWith("]")) {
+    const subjectPieces = subjectString.split("[");
     if (subjectPieces.length < 2) {
       return {
-        errorMessage: 'Relationship must be of the form `resource@subject[caveat]`',
+        errorMessage: "Relationship must be of the form `resource@subject[caveat]`",
       };
     }
 
     subjectString = subjectPieces[0];
-    caveatString = '[' + subjectPieces.splice(1).join('[');
+    caveatString = "[" + subjectPieces.splice(1).join("[");
   }
 
   const resource = OBJECT_AND_RELATION_REGEX.exec(resourceString);
@@ -102,23 +106,25 @@ export const parseRelationshipWithError = (value: string): Relationship | ParseR
 
   if (!resource?.groups || !subject?.groups) {
     return {
-      errorMessage: 'Relationship must be of the form `resourcetype:resourceid#relation@subjecttype:subjectid`',
+      errorMessage:
+        "Relationship must be of the form `resourcetype:resourceid#relation@subjecttype:subjectid`",
     };
   }
 
   if (caveatString && !caveat?.groups) {
     return {
-      errorMessage: 'Relationship must be of the form `resourcetype:resourceid#relation@subjecttype:subjectid[caveatName]`',
+      errorMessage:
+        "Relationship must be of the form `resourcetype:resourceid#relation@subjecttype:subjectid[caveatName]`",
     };
   }
 
-  const resourceNamespace = resource?.groups['namespace'] ?? '';
-  const resourceObjectId = resource?.groups['object_id'] ?? '';
-  const resourceRelation = resource?.groups['relation'] ?? '';
+  const resourceNamespace = resource?.groups["namespace"] ?? "";
+  const resourceObjectId = resource?.groups["object_id"] ?? "";
+  const resourceRelation = resource?.groups["relation"] ?? "";
 
-  const subjectNamespace = subject?.groups['namespace'] ?? '';
-  const subjectObjectId = subject?.groups['object_id'] ?? '';
-  const subjectRelation = subject?.groups['relation'] ?? '...';
+  const subjectNamespace = subject?.groups["namespace"] ?? "";
+  const subjectObjectId = subject?.groups["object_id"] ?? "";
+  const subjectRelation = subject?.groups["relation"] ?? "...";
 
   // Validate the namespaces, object ids and relation(s).
   if (!NAMESPACE_REGEX.test(resourceNamespace)) {
@@ -168,13 +174,13 @@ export const parseRelationshipWithError = (value: string): Relationship | ParseR
   let contextualizedCaveat: ContextualizedCaveat | undefined = undefined;
   if (caveat?.groups) {
     contextualizedCaveat = {
-      caveatName: caveat.groups['caveat_name'] ?? '',
+      caveatName: caveat.groups["caveat_name"] ?? "",
     };
 
-    if (caveat.groups['caveat_context']) {
+    if (caveat.groups["caveat_context"]) {
       try {
-        const parsed = JSON.parse(caveat.groups['caveat_context']);
-        if (typeof parsed !== 'object') {
+        const parsed = JSON.parse(caveat.groups["caveat_context"]);
+        if (typeof parsed !== "object") {
           return {
             errorMessage: `Invalid value for caveat context: must be object`,
           };
@@ -182,9 +188,9 @@ export const parseRelationshipWithError = (value: string): Relationship | ParseR
 
         contextualizedCaveat.context = Struct.fromJson(parsed);
       } catch (e: unknown) {
-        let message = ""
+        let message = "";
         if (e instanceof Error) {
-          message = e.message
+          message = e.message;
         }
         return {
           errorMessage: `Invalid caveat context: ${message}`,
@@ -212,16 +218,16 @@ export const parseRelationshipWithError = (value: string): Relationship | ParseR
  * parseRelationships parses the relationships found in the newline delimited relationships string.
  */
 export const parseRelationships = (value: string): Relationship[] => {
-  const lines = value.split('\n');
+  const lines = value.split("\n");
   const relationships: Relationship[] = [];
 
   for (let i = 0; i < lines.length; ++i) {
     const trimmed = lines[i].trim();
-    if (!trimmed.length || trimmed.startsWith('//')) {
+    if (!trimmed.length || trimmed.startsWith("//")) {
       continue;
     }
 
-    const pieces = trimmed.split('@', 2);
+    const pieces = trimmed.split("@", 2);
     if (pieces.length < 2) {
       continue;
     }
@@ -242,11 +248,11 @@ export const parseRelationships = (value: string): Relationship[] => {
  * for each invalid one found.
  */
 export const parseRelationshipsWithErrors = (relsStr: string): RelationshipFound[] => {
-  const lines = relsStr.split('\n');
+  const lines = relsStr.split("\n");
   return lines
     .map((line: string, index: number) => {
       const trimmed = line.trim();
-      if (!trimmed.length || trimmed.startsWith('//')) {
+      if (!trimmed.length || trimmed.startsWith("//")) {
         return undefined;
       }
 
@@ -264,12 +270,13 @@ export const parseRelationshipsWithErrors = (relsStr: string): RelationshipFound
  * convertRelationshipToString converts a Relationship into its string form.
  */
 export const convertRelationshipToString = (rel: Relationship) => {
-  let caveatString = '';
+  let caveatString = "";
   if (rel.caveat) {
-    caveatString = `[${rel.caveat.caveatName}${rel.caveat.context ? `:${Struct.toJsonString(rel.caveat.context)}` : ''}]`;
+    caveatString = `[${rel.caveat.caveatName}${rel.caveat.context ? `:${Struct.toJsonString(rel.caveat.context)}` : ""}]`;
   }
 
-  const subjectRelation = rel.subject?.relation && rel.subject.relation !== '...' ? `#${rel.subject.relation}` : '';
+  const subjectRelation =
+    rel.subject?.relation && rel.subject.relation !== "..." ? `#${rel.subject.relation}` : "";
   return `${rel.resourceAndRelation?.namespace}:${rel.resourceAndRelation?.objectId}#${rel.resourceAndRelation?.relation}@${rel.subject?.namespace}:${rel.subject?.objectId}${subjectRelation}${caveatString}`;
 };
 
@@ -291,7 +298,7 @@ export type RelationshipOrComment =
  * and returns them.
  */
 export const parseRelationshipsAndComments = (value: string): RelationshipOrComment[] => {
-  const lines = value.split('\n');
+  const lines = value.split("\n");
   const found: RelationshipOrComment[] = [];
 
   for (let i = 0; i < lines.length; ++i) {
@@ -300,7 +307,7 @@ export const parseRelationshipsAndComments = (value: string): RelationshipOrComm
       continue;
     }
 
-    if (trimmed.startsWith('//')) {
+    if (trimmed.startsWith("//")) {
       found.push({
         comment: trimmed.substring(2).trim(),
       });
@@ -308,7 +315,7 @@ export const parseRelationshipsAndComments = (value: string): RelationshipOrComm
     }
 
     const parsed = parseRelationshipWithError(trimmed);
-    if ('errorMessage' in parsed) {
+    if ("errorMessage" in parsed) {
       found.push({
         comment: `${parsed.errorMessage}: ${trimmed}`,
       });
@@ -332,7 +339,7 @@ export interface RelationshipWithComments {
  * and returns them.
  */
 export const parseRelationshipsWithComments = (value: string): RelationshipWithComments[] => {
-  const lines = value.split('\n');
+  const lines = value.split("\n");
   const rels: RelationshipWithComments[] = [];
   let comments: string[] = [];
 
@@ -342,7 +349,7 @@ export const parseRelationshipsWithComments = (value: string): RelationshipWithC
       continue;
     }
 
-    if (trimmed.startsWith('//')) {
+    if (trimmed.startsWith("//")) {
       comments.push(trimmed.substring(2).trim());
       continue;
     }
@@ -372,7 +379,10 @@ export const mergeRelationshipsStringAndComments = (existing: string, updated: R
   return mergeRelationshipsAndComments(parsed, updated);
 };
 
-export const mergeRelationshipsAndComments = (existing: RelationshipOrComment[], updated: Relationship[]) => {
+export const mergeRelationshipsAndComments = (
+  existing: RelationshipOrComment[],
+  updated: Relationship[],
+) => {
   const updatedRelStrings = updated.map(convertRelationshipToString);
 
   const existingRelStringsSet = new Set();
@@ -380,7 +390,7 @@ export const mergeRelationshipsAndComments = (existing: RelationshipOrComment[],
 
   const filtered = existing
     .filter((e) => {
-      if ('comment' in e) {
+      if ("comment" in e) {
         return true;
       }
 
@@ -389,7 +399,7 @@ export const mergeRelationshipsAndComments = (existing: RelationshipOrComment[],
       return updatedRelStringsSet.has(relString);
     })
     .map((e) => {
-      if ('comment' in e) {
+      if ("comment" in e) {
         return `// ${e.comment}`;
       }
 
@@ -401,5 +411,5 @@ export const mergeRelationshipsAndComments = (existing: RelationshipOrComment[],
   });
   filtered.push(...updatedFiltered);
 
-  return filtered.join('\n');
+  return filtered.join("\n");
 };

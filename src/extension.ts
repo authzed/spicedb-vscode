@@ -1,19 +1,24 @@
-import * as vscode from 'vscode';
-import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient/node';
+import * as vscode from "vscode";
+import {
+  LanguageClient,
+  LanguageClientOptions,
+  ServerOptions,
+  TransportKind,
+} from "vscode-languageclient/node";
 
-import { type ResolvedReference, Resolver, parse } from '@authzed/spicedb-parser-js';
+import { type ResolvedReference, Resolver, parse } from "@authzed/spicedb-parser-js";
 
-import { checkSpicedbVersion, getInstallCommand, languageServerBinaryPath } from './binary';
-import { CheckWatchProvider } from './checkwatchprovider';
+import { checkSpicedbVersion, getInstallCommand, languageServerBinaryPath } from "./binary";
+import { CheckWatchProvider } from "./checkwatchprovider";
 
 function reassignZedYamlLanguage(doc: vscode.TextDocument) {
-  if (doc.fileName.endsWith('.zed.yaml') && doc.languageId !== 'spicedb-yaml') {
-    vscode.languages.setTextDocumentLanguage(doc, 'spicedb-yaml');
+  if (doc.fileName.endsWith(".zed.yaml") && doc.languageId !== "spicedb-yaml") {
+    vscode.languages.setTextDocumentLanguage(doc, "spicedb-yaml");
   }
 }
 
 export function activate(context: vscode.ExtensionContext) {
-  console.log('spicedb-vscode is now active');
+  console.log("spicedb-vscode is now active");
 
   // Reassign language for any already-open .zed.yaml files detected as plain yaml
   vscode.workspace.textDocuments.forEach(reassignZedYamlLanguage);
@@ -21,10 +26,12 @@ export function activate(context: vscode.ExtensionContext) {
 
   const checkWatchProvider = new CheckWatchProvider(context.extensionUri);
 
-  context.subscriptions.push(vscode.window.registerWebviewViewProvider(CheckWatchProvider.viewType, checkWatchProvider));
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(CheckWatchProvider.viewType, checkWatchProvider),
+  );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('spicedb.addCheckWatch', () => {
+    vscode.commands.registerCommand("spicedb.addCheckWatch", () => {
       checkWatchProvider.addWatch();
     }),
   );
@@ -39,13 +46,13 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.workspace.onDidChangeTextDocument((e: vscode.TextDocumentChangeEvent) => {
-      if (e.document.uri.fsPath.endsWith('.zed') || e.document.languageId === 'spicedb') {
+      if (e.document.uri.fsPath.endsWith(".zed") || e.document.languageId === "spicedb") {
         if (vscode.window.activeTextEditor?.document.uri.fsPath === e.document.uri.fsPath) {
           checkWatchProvider.setActiveSchema(e.document.uri.fsPath, e.document.getText());
         }
       }
 
-      if (e.document.uri.fsPath.endsWith('.zed.yaml')) {
+      if (e.document.uri.fsPath.endsWith(".zed.yaml")) {
         if (vscode.window.activeTextEditor?.document.uri.fsPath === e.document.uri.fsPath) {
           checkWatchProvider.setActiveYaml(e.document.uri.fsPath, e.document.getText());
         }
@@ -55,7 +62,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   // TODO: Move this into the language server.
   vscode.languages.registerDocumentSemanticTokensProvider(
-    'spicedb',
+    "spicedb",
     {
       provideDocumentSemanticTokens: function (
         document: vscode.TextDocument,
@@ -79,7 +86,13 @@ export function activate(context: vscode.ExtensionContext) {
         let prevLine = 0;
         let prevChar = 0;
 
-        const appendData = (lineNumber: number, colPosition: number, length: number, tokenType: number, modifierIndex: number) => {
+        const appendData = (
+          lineNumber: number,
+          colPosition: number,
+          length: number,
+          tokenType: number,
+          modifierIndex: number,
+        ) => {
           data.push(
             lineNumber - prevLine,
             prevLine === lineNumber ? colPosition - prevChar : colPosition,
@@ -100,9 +113,15 @@ export function activate(context: vscode.ExtensionContext) {
           const colPosition = resolved.reference.range.startIndex.column - 1;
 
           switch (resolved.kind) {
-            case 'type':
+            case "type":
               if (resolved.referencedTypeAndRelation === undefined) {
-                appendData(lineNumber, colPosition, resolved.reference.path.length, /* type.unknown */ 3, 0);
+                appendData(
+                  lineNumber,
+                  colPosition,
+                  resolved.reference.path.length,
+                  /* type.unknown */ 3,
+                  0,
+                );
                 return;
               }
 
@@ -137,17 +156,35 @@ export function activate(context: vscode.ExtensionContext) {
               }
               break;
 
-            case 'expression':
+            case "expression":
               if (resolved.resolvedRelationOrPermission === undefined) {
-                appendData(lineNumber, colPosition, resolved.reference.relationName.length, /* property.unknown */ 5, 0);
+                appendData(
+                  lineNumber,
+                  colPosition,
+                  resolved.reference.relationName.length,
+                  /* property.unknown */ 5,
+                  0,
+                );
               } else {
                 switch (resolved.resolvedRelationOrPermission.kind) {
-                  case 'permission':
-                    appendData(lineNumber, colPosition, resolved.reference.relationName.length, /* member */ 2, 0);
+                  case "permission":
+                    appendData(
+                      lineNumber,
+                      colPosition,
+                      resolved.reference.relationName.length,
+                      /* member */ 2,
+                      0,
+                    );
                     break;
 
-                  case 'relation':
-                    appendData(lineNumber, colPosition, resolved.reference.relationName.length, /* property */ 1, 0);
+                  case "relation":
+                    appendData(
+                      lineNumber,
+                      colPosition,
+                      resolved.reference.relationName.length,
+                      /* property */ 1,
+                      0,
+                    );
                     break;
                 }
               }
@@ -162,8 +199,15 @@ export function activate(context: vscode.ExtensionContext) {
       },
     },
     {
-      tokenTypes: ['type', 'property', 'member', 'type.unknown', 'member.unknown', 'property.unknown'],
-      tokenModifiers: ['declaration'],
+      tokenTypes: [
+        "type",
+        "property",
+        "member",
+        "type.unknown",
+        "member.unknown",
+        "property.unknown",
+      ],
+      tokenModifiers: ["declaration"],
     },
   );
 
@@ -175,20 +219,25 @@ async function startLanguageServer() {
   const serverBinary = await languageServerBinaryPath();
   if (!serverBinary) {
     const installCommand = getInstallCommand();
-    if (installCommand.startsWith('https://')) {
-      const OpenInstall = 'Open Installation Instructions';
+    if (installCommand.startsWith("https://")) {
+      const OpenInstall = "Open Installation Instructions";
       vscode.window
-        .showInformationMessage('`spicedb` binary is not installed. Click below to open the installation instructions.', OpenInstall)
+        .showInformationMessage(
+          "`spicedb` binary is not installed. Click below to open the installation instructions.",
+          OpenInstall,
+        )
         .then((selection) => {
           if (selection === OpenInstall) {
             vscode.env.openExternal(vscode.Uri.parse(installCommand));
           }
         });
     } else {
-      vscode.window.showErrorMessage('`spicedb` binary is not installed. Please install it using `' + installCommand + '`');
+      vscode.window.showErrorMessage(
+        "`spicedb` binary is not installed. Please install it using `" + installCommand + "`",
+      );
     }
 
-    console.error('Failed to find the SpiceDB language server binary');
+    console.error("Failed to find the SpiceDB language server binary");
     return;
   }
 
@@ -197,32 +246,37 @@ async function startLanguageServer() {
   const serverOptions: ServerOptions = {
     run: {
       command: serverBinary,
-      args: ['lsp'],
+      args: ["lsp"],
       transport: TransportKind.stdio,
     },
     debug: {
       command: serverBinary,
-      args: ['lsp'],
+      args: ["lsp"],
       transport: TransportKind.stdio,
     },
   };
 
   const clientOptions: LanguageClientOptions = {
     documentSelector: [
-      { scheme: 'file', language: 'spicedb' },
-      { scheme: 'file', language: 'spicedb-yaml' },
+      { scheme: "file", language: "spicedb" },
+      { scheme: "file", language: "spicedb-yaml" },
     ],
     synchronize: {
-      fileEvents: vscode.workspace.createFileSystemWatcher('**/*.zed{,.yaml}'),
+      fileEvents: vscode.workspace.createFileSystemWatcher("**/*.zed{,.yaml}"),
     },
   };
 
   // Create the language client and start the client.
-  const client = new LanguageClient('spicedbLanguageServer', 'SpiceDB Language Server', serverOptions, clientOptions);
+  const client = new LanguageClient(
+    "spicedbLanguageServer",
+    "SpiceDB Language Server",
+    serverOptions,
+    clientOptions,
+  );
 
   // Start the client. This will also launch the server.
   await client.start();
-  console.log('spicedb-vscode is now active with its LSP running');
+  console.log("spicedb-vscode is now active with its LSP running");
 }
 
 export function deactivate() {}

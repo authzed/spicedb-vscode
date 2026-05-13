@@ -1,20 +1,34 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import { VSCodeButton, VSCodePanelView, VSCodeProgressRing, VSCodeTextField } from '@vscode/webview-ui-toolkit/react';
-import yaml from 'yaml';
+import {
+  VSCodeButton,
+  VSCodePanelView,
+  VSCodeProgressRing,
+  VSCodeTextField,
+} from "@vscode/webview-ui-toolkit/react";
+import yaml from "yaml";
 
-import './App.css';
-import { useDeveloperService } from './services/developerservice';
-import { LiveCheckItem, LiveCheckItemStatus, LiveCheckStatus, useLiveCheckService } from './services/livecheck';
+import "./App.css";
+import { useDeveloperService } from "./services/developerservice";
+import {
+  LiveCheckItem,
+  LiveCheckItemStatus,
+  LiveCheckStatus,
+  useLiveCheckService,
+} from "./services/livecheck";
 
 function App() {
   useEffect(() => {
     const vscode = (window as any).acquireVsCodeApi();
-    vscode.postMessage({ type: 'ready' });
+    vscode.postMessage({ type: "ready" });
   }, []);
 
-  const [activeFilePath, setActiveFilePath] = useState<string | undefined>((window as any).ACTIVE_FILE_PATH);
-  const [activeLanguageId, setActiveLanguageId] = useState<string | undefined>((window as any).ACTIVE_LANGUAGE_ID);
+  const [activeFilePath, setActiveFilePath] = useState<string | undefined>(
+    (window as any).ACTIVE_FILE_PATH,
+  );
+  const [activeLanguageId, setActiveLanguageId] = useState<string | undefined>(
+    (window as any).ACTIVE_LANGUAGE_ID,
+  );
 
   const [activeSchemaPath, setActiveSchemaPath] = useState<string | null>(null);
   const [activeSchema, setActiveSchema] = useState<string | null>(null);
@@ -31,11 +45,11 @@ function App() {
     const listener = (event: any) => {
       const message = event.data;
       switch (message.type) {
-        case 'addWatch':
+        case "addWatch":
           liveCheckService.addItem();
           break;
 
-        case 'schema':
+        case "schema":
           setActiveSchemaPath(message.filename);
           setActiveSchema(message.schema);
           if (message.schema) {
@@ -43,7 +57,7 @@ function App() {
           }
           break;
 
-        case 'yaml':
+        case "yaml":
           setActiveYamlPath(message.filename);
           setActiveYaml(message.yaml);
 
@@ -59,14 +73,16 @@ function App() {
               return;
             }
 
-            if (!('relationships' in parsed)) {
+            if (!("relationships" in parsed)) {
               setYamlIssue('YAML file does not contain a "relationships" block');
               return;
             }
 
             const relationships = parsed.relationships;
-            if (typeof relationships !== 'string') {
-              setYamlIssue('YAML file "relationships" block must be a string, containing a relationship per newline');
+            if (typeof relationships !== "string") {
+              setYamlIssue(
+                'YAML file "relationships" block must be a string, containing a relationship per newline',
+              );
               return;
             }
 
@@ -75,14 +91,14 @@ function App() {
           }
           break;
 
-        case 'activeFile':
+        case "activeFile":
           setActiveFilePath(message.filePath);
           setActiveLanguageId(message.languageId);
       }
     };
 
-    window.addEventListener('message', listener);
-    return () => window.removeEventListener('message', listener);
+    window.addEventListener("message", listener);
+    return () => window.removeEventListener("message", listener);
   }, [liveCheckService]);
 
   const removeWatch = (index: number) => {
@@ -92,19 +108,19 @@ function App() {
   const updateWatch = (index: number, field: keyof LiveCheckItem, value: string) => {
     const item = liveCheckService.items[index];
     switch (field) {
-      case 'object':
+      case "object":
         item.object = value;
         break;
 
-      case 'action':
+      case "action":
         item.action = value;
         break;
 
-      case 'subject':
+      case "subject":
         item.subject = value;
         break;
 
-      case 'context':
+      case "context":
         item.context = value;
         break;
     }
@@ -113,24 +129,27 @@ function App() {
   };
 
   const isValidFile =
-    !!activeFilePath && (activeFilePath.endsWith('.zed') || activeFilePath.endsWith('.zed.yaml') || activeLanguageId === 'spicedb');
+    !!activeFilePath &&
+    (activeFilePath.endsWith(".zed") ||
+      activeFilePath.endsWith(".zed.yaml") ||
+      activeLanguageId === "spicedb");
   const hasValidSchemaAndYaml = !!activeSchema && !!activeYaml && !yamlIssue;
 
   return (
     <VSCodePanelView>
       {!isValidFile && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <i className="codicon codicon-info"></i>
           <div>
-            The current editor is not viewing a SpiceDB schema (<code>.zed</code>) file or relationships data file (<code>.zed.yaml</code>)
-            file
+            The current editor is not viewing a SpiceDB schema (<code>.zed</code>) file or
+            relationships data file (<code>.zed.yaml</code>) file
           </div>
         </div>
       )}
       {isValidFile && !hasValidSchemaAndYaml && (
         <>
           {!activeSchema && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <i className="codicon codicon-warning"></i>
               <div>
                 No schema file with extension <code>.zed</code> found in the current directory.
@@ -138,79 +157,103 @@ function App() {
             </div>
           )}
           {!!activeSchema && !activeYaml && (
-            <div style={{ display: 'block', textAlign: 'left' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '20px' }}>
+            <div style={{ display: "block", textAlign: "left" }}>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "20px" }}
+              >
                 <i className="codicon codicon-arrow-circle-right"></i>
                 <div>
-                  To enable the Check Watches panel, please create a YAML file named <code>{activeSchemaPath}.yaml</code> and add{' '}
-                  <code>relationships</code> to it.
+                  To enable the Check Watches panel, please create a YAML file named{" "}
+                  <code>{activeSchemaPath}.yaml</code> and add <code>relationships</code> to it.
                 </div>
               </div>
             </div>
           )}
           {!!yamlIssue && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <i className="codicon codicon-warning"></i>
-              <div style={{ color: '#FF8488' }}>
+              <div style={{ color: "#FF8488" }}>
                 Parse failure for YAML relationships file <code>{activeYamlPath}</code>: {yamlIssue}
               </div>
             </div>
           )}
         </>
       )}
-      {isValidFile && hasValidSchemaAndYaml && devService.state.status === 'loading' && <VSCodeProgressRing />}
-      {isValidFile && hasValidSchemaAndYaml && (devService.state.status === 'loaderror' || devService.state.status === 'unsupported') && (
-        <div style={{ display: 'block', textAlign: 'left' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <i className="codicon codicon-error"></i>
-            <div style={{ color: '#FF8488' }}>
-              {devService.state.status === 'unsupported'
-                ? 'WebAssembly is not supported in this environment.'
-                : 'Failed to load the SpiceDB developer WASM module.'}
+      {isValidFile && hasValidSchemaAndYaml && devService.state.status === "loading" && (
+        <VSCodeProgressRing />
+      )}
+      {isValidFile &&
+        hasValidSchemaAndYaml &&
+        (devService.state.status === "loaderror" || devService.state.status === "unsupported") && (
+          <div style={{ display: "block", textAlign: "left" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <i className="codicon codicon-error"></i>
+              <div style={{ color: "#FF8488" }}>
+                {devService.state.status === "unsupported"
+                  ? "WebAssembly is not supported in this environment."
+                  : "Failed to load the SpiceDB developer WASM module."}
+              </div>
+            </div>
+            <div style={{ marginTop: "10px" }}>
+              The Check Watches panel requires a WASM binary at{" "}
+              <code>src/check-watch-panel/build/main.wasm</code>. To download it, run from the
+              SpiceDB repository:
+            </div>
+            <pre
+              style={{
+                marginTop: "5px",
+                padding: "8px",
+                backgroundColor: "var(--vscode-textCodeBlock-background)",
+                whiteSpace: "pre-wrap",
+              }}
+            >
+              GOOS=js GOARCH=wasm go build -o main.wasm ./cmd/spicedb-wasm
+            </pre>
+            <div>
+              Then copy <code>main.wasm</code> into <code>src/check-watch-panel/build/</code>.
             </div>
           </div>
-          <div style={{ marginTop: '10px' }}>
-            The Check Watches panel requires a WASM binary at <code>src/check-watch-panel/build/main.wasm</code>. To download it, run from
-            the SpiceDB repository:
-          </div>
-          <pre
-            style={{ marginTop: '5px', padding: '8px', backgroundColor: 'var(--vscode-textCodeBlock-background)', whiteSpace: 'pre-wrap' }}
-          >
-            GOOS=js GOARCH=wasm go build -o main.wasm ./cmd/spicedb-wasm
-          </pre>
-          <div>
-            Then copy <code>main.wasm</code> into <code>src/check-watch-panel/build/</code>.
-          </div>
-        </div>
-      )}
-      {isValidFile && hasValidSchemaAndYaml && devService.state.status === 'ready' && (
-        <div style={{ width: '100%' }}>
-          <div style={{ position: 'relative', width: '100%' }}>
+        )}
+      {isValidFile && hasValidSchemaAndYaml && devService.state.status === "ready" && (
+        <div style={{ width: "100%" }}>
+          <div style={{ position: "relative", width: "100%" }}>
             {(liveCheckService.state.status === LiveCheckStatus.SERVICE_ERROR ||
               liveCheckService.state.status === LiveCheckStatus.PARSE_ERROR) && (
               <div
                 style={{
-                  position: 'absolute',
-                  top: '0',
-                  left: '0',
-                  bottom: '0',
-                  right: '0',
-                  width: '100%',
-                  padding: '10px',
-                  backgroundColor: 'rgba(32, 32, 32, 0.9)',
-                  zIndex: '100000000000',
+                  position: "absolute",
+                  top: "0",
+                  left: "0",
+                  bottom: "0",
+                  right: "0",
+                  width: "100%",
+                  padding: "10px",
+                  backgroundColor: "rgba(32, 32, 32, 0.9)",
+                  zIndex: "100000000000",
                 }}
               >
                 {liveCheckService.state.status === LiveCheckStatus.SERVICE_ERROR && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                     <i className="codicon codicon-error"></i>
-                    <div style={{ color: 'red' }}>An error occurred while trying to run the checks: {liveCheckService.state.serverErr}</div>
+                    <div style={{ color: "red" }}>
+                      An error occurred while trying to run the checks:{" "}
+                      {liveCheckService.state.serverErr}
+                    </div>
                   </div>
                 )}
                 {liveCheckService.state.status === LiveCheckStatus.PARSE_ERROR && (
                   <div>
                     {liveCheckService.state.requestErrors?.map((err, index) => (
-                      <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'orange', marginBottom: '5px' }}>
+                      <div
+                        key={index}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "10px",
+                          color: "orange",
+                          marginBottom: "5px",
+                        }}
+                      >
                         <i className="codicon codicon-warning"></i> {err.message}
                       </div>
                     ))}
@@ -220,7 +263,7 @@ function App() {
             )}
             <div>
               {liveCheckService.items.length > 0 && (
-                <table style={{ width: '100%' }}>
+                <table style={{ width: "100%" }}>
                   <thead className="table-header">
                     <th></th>
                     <th>Resource</th>
@@ -242,8 +285,10 @@ function App() {
                 </table>
               )}
               {liveCheckService.items.length === 0 && (
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <VSCodeButton onClick={() => liveCheckService.addItem()}>Add SpiceDB Check Watch</VSCodeButton>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <VSCodeButton onClick={() => liveCheckService.addItem()}>
+                    Add SpiceDB Check Watch
+                  </VSCodeButton>
                 </div>
               )}
             </div>
@@ -272,34 +317,34 @@ function WatchRow(props: {
         </td>
         <td>
           <VSCodeTextField
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
             value={props.item.object}
             placeholder="document:1"
-            onInput={(e) => updateWatch('object', e.target)}
+            onInput={(e) => updateWatch("object", e.target)}
           />
         </td>
         <td>
           <VSCodeTextField
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
             value={props.item.action}
             placeholder="view"
-            onInput={(e) => updateWatch('action', e.target)}
+            onInput={(e) => updateWatch("action", e.target)}
           />
         </td>
         <td>
           <VSCodeTextField
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
             value={props.item.subject}
             placeholder="user:someuser"
-            onInput={(e) => updateWatch('subject', e.target)}
+            onInput={(e) => updateWatch("subject", e.target)}
           />
         </td>
         <td>
           <VSCodeTextField
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
             value={props.item.context}
             placeholder="{'some': 'context'}"
-            onInput={(e) => updateWatch('context', e.target)}
+            onInput={(e) => updateWatch("context", e.target)}
           />
         </td>
         <td>
@@ -311,7 +356,7 @@ function WatchRow(props: {
       {!!props.item.errorMessage && (
         <tr>
           <td colSpan={5}>
-            <div style={{ color: 'orange' }}>{props.item.errorMessage}</div>
+            <div style={{ color: "orange" }}>{props.item.errorMessage}</div>
           </td>
         </tr>
       )}
@@ -322,7 +367,7 @@ function WatchRow(props: {
 function StatusIcon(props: { item: LiveCheckItem }) {
   // Icon reference: https://code.visualstudio.com/api/references/icons-in-labels
   if (props.item.errorMessage) {
-    return <i className="codicon codicon-alert" style={{ color: 'yellow' }}></i>;
+    return <i className="codicon codicon-alert" style={{ color: "yellow" }}></i>;
   }
 
   switch (props.item.status) {
@@ -330,19 +375,19 @@ function StatusIcon(props: { item: LiveCheckItem }) {
       return <i className="codicon codicon-circle-large-outline"></i>;
 
     case LiveCheckItemStatus.NOT_FOUND:
-      return <i className="codicon codicon-stop" style={{ color: 'red' }}></i>;
+      return <i className="codicon codicon-stop" style={{ color: "red" }}></i>;
 
     case LiveCheckItemStatus.FOUND:
-      return <i className="codicon codicon-verified-filled" style={{ color: 'green' }}></i>;
+      return <i className="codicon codicon-verified-filled" style={{ color: "green" }}></i>;
 
     case LiveCheckItemStatus.INVALID:
-      return <i className="codicon codicon-circle-slash" style={{ color: 'orange' }}></i>;
+      return <i className="codicon codicon-circle-slash" style={{ color: "orange" }}></i>;
 
     case LiveCheckItemStatus.CAVEATED:
-      return <i className="codicon codicon-array" style={{ color: 'purple' }}></i>;
+      return <i className="codicon codicon-array" style={{ color: "purple" }}></i>;
 
     case LiveCheckItemStatus.NOT_VALID:
-      return <i className="codicon codicon-circle-slash" style={{ color: 'orange' }}></i>;
+      return <i className="codicon codicon-circle-slash" style={{ color: "orange" }}></i>;
 
     default:
       return <i className="codicon codicon-debug-step-over"></i>;
