@@ -181,9 +181,13 @@ export const parseRelationshipWithError = (value: string): Relationship | ParseR
         }
 
         contextualizedCaveat.context = Struct.fromJson(parsed);
-      } catch (e) {
+      } catch (e: unknown) {
+        let message = ""
+        if (e instanceof Error) {
+          message = e.message
+        }
         return {
-          errorMessage: `Invalid caveat context: ${e}`,
+          errorMessage: `Invalid caveat context: ${message}`,
         };
       }
     }

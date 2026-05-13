@@ -32,7 +32,7 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.window.onDidChangeActiveTextEditor((editor) => {
       if (editor) {
-        checkWatchProvider.performUpdate(editor.document.uri.fsPath);
+        void checkWatchProvider.performUpdate(editor.document.uri.fsPath);
       }
     }),
   );
@@ -59,7 +59,6 @@ export function activate(context: vscode.ExtensionContext) {
     {
       provideDocumentSemanticTokens: function (
         document: vscode.TextDocument,
-        _token: vscode.CancellationToken,
       ): vscode.ProviderResult<vscode.SemanticTokens> {
         const text = document.getText();
         const parserResult = parse(text);
@@ -168,12 +167,12 @@ export function activate(context: vscode.ExtensionContext) {
     },
   );
 
-  startLanguageServer(context);
+  void startLanguageServer();
 }
 
-async function startLanguageServer(context: vscode.ExtensionContext) {
+async function startLanguageServer() {
   // Start the LSP hooks using the language server found in the SpiceDB binary.
-  const serverBinary = await languageServerBinaryPath(context);
+  const serverBinary = await languageServerBinaryPath();
   if (!serverBinary) {
     const installCommand = getInstallCommand();
     if (installCommand.startsWith('https://')) {

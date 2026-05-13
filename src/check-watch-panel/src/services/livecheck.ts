@@ -215,7 +215,7 @@ export function useLiveCheckService(developerService: DeveloperService): LiveChe
       ];
       setItems(newItems);
     },
-    itemUpdated: (item: LiveCheckItem) => {
+    itemUpdated: () => {
       check(items);
     },
     removeItem: (item: LiveCheckItem) => {

@@ -10,7 +10,7 @@ const execFileAsync = promisify(execFile);
 
 export const MIN_SPICEDB_VERSION = '1.52.0';
 
-export async function languageServerBinaryPath(_context: vscode.ExtensionContext): Promise<string | undefined> {
+export async function languageServerBinaryPath(): Promise<string | undefined> {
   const config = vscode.workspace.getConfiguration('spicedb');
   const customPath = config.get<string>('binaryPath');
   if (customPath) {

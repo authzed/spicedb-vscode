@@ -197,8 +197,6 @@ class DeveloperServiceRequest {
   }
 }
 
-const wasmVersion: number | string = Math.random();
-
 /**
  * useDeveloperService returns a reference to the developer service for invoking calls against the WASM-based
  * developer package. Note that it is safe to invoke this hook multiple times; it will instantiate a singleton
@@ -227,7 +225,7 @@ export function useDeveloperService(): DeveloperService {
     }
 
     // Fetch the WASM file with progress tracking.
-    const fetched = await fetch((global as any).WASM_BUNDLE_URI);
+    const fetched = await fetch((globalThis as any).WASM_BUNDLE_URI);
     const contentLength = +(fetched.headers.get('Content-Length') ?? ESTIMATED_WASM_BINARY_SIZE);
 
     const reader = fetched.body?.getReader();
@@ -255,7 +253,7 @@ export function useDeveloperService(): DeveloperService {
 
     // Refetch, which should be from cache.
     const go = new (window as any).Go();
-    const refetched = await fetch((global as any).WASM_BUNDLE_URI);
+    const refetched = await fetch((globalThis as any).WASM_BUNDLE_URI);
 
     try {
       const result = await WebAssembly.instantiateStreaming(refetched, go.importObject);
@@ -275,14 +273,14 @@ export function useDeveloperService(): DeveloperService {
     switch (state.status) {
       case 'initializing':
         const initialized = (window as any)[ENTRYPOINT_FUNCTION];
-        if (!!initialized) {
+        if (initialized) {
           setState({
             status: 'ready',
           });
           return;
         }
 
-        if (!global.WebAssembly) {
+        if (!globalThis.WebAssembly) {
           console.error('WebAssembly is not supported in your browser');
           setState({
             status: 'unsupported',
@@ -297,7 +295,7 @@ export function useDeveloperService(): DeveloperService {
           return;
         }
 
-        loadWebAssembly();
+        void loadWebAssembly();
         break;
 
       case 'ready':

@@ -15,7 +15,7 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
 
   constructor(private readonly _extensionUri: vscode.Uri) {}
 
-  public resolveWebviewView(webviewView: vscode.WebviewView, _context: vscode.WebviewViewResolveContext, _token: vscode.CancellationToken) {
+  public resolveWebviewView(webviewView: vscode.WebviewView) {
     this._view = webviewView;
 
     webviewView.webview.options = {
@@ -32,7 +32,7 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
             vscode.window.activeTextEditor?.document.uri.fsPath.endsWith('.zed.yaml') ||
             vscode.window.activeTextEditor?.document.languageId === 'spicedb'
           ) {
-            this.performUpdate(vscode.window.activeTextEditor?.document.uri.fsPath);
+            void this.performUpdate(vscode.window.activeTextEditor?.document.uri.fsPath);
           }
           break;
       }
@@ -145,18 +145,18 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
 				<meta charset="UTF-8">
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>SpiceDB Watches</title>
-				<link href="${cssUri}" rel="stylesheet">
-				<link href="${codiconsUri}" rel="stylesheet" />
+				<link href="${cssUri.toString()}" rel="stylesheet">
+				<link href="${codiconsUri.toString()}" rel="stylesheet" />
 				<script>
-					window.WASM_BUNDLE_URI = '${wasmBundleUri}';
-					window.ACTIVE_FILE_PATH = '${activeFilePath}';
-					window.ACTIVE_LANGUAGE_ID = '${activeLanguageId}';
+					window.WASM_BUNDLE_URI = '${wasmBundleUri.toString()}';
+					window.ACTIVE_FILE_PATH = '${activeFilePath.toString()}';
+					window.ACTIVE_LANGUAGE_ID = '${activeLanguageId.toString()}';
 				</script>
-                <script src="${goScriptUri}"></script>
+                <script src="${goScriptUri.toString()}"></script>
 			</head>
 			<body>
 				<div id="root"></div>
-                <script nonce="${nonce}" src="${scriptUri}"></script>
+                <script nonce="${nonce}" src="${scriptUri.toString()}"></script>
 			</body>
 			</html>`;
   }
