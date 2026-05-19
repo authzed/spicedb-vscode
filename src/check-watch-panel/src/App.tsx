@@ -335,19 +335,49 @@ function StatusIcon(props: { item: LiveCheckItem }) {
       );
 
     case LiveCheckItemStatus.NOT_FOUND:
-      return <i className="codicon codicon-stop" style={{ color: 'red' }} title="Permission denied: the subject does not have this permission on the resource."></i>;
+      return (
+        <i
+          className="codicon codicon-stop"
+          style={{ color: 'red' }}
+          title="Permission denied: the subject does not have this permission on the resource."
+        ></i>
+      );
 
     case LiveCheckItemStatus.FOUND:
-      return <i className="codicon codicon-verified-filled" style={{ color: 'green' }} title="Permission granted: the subject has this permission on the resource."></i>;
+      return (
+        <i
+          className="codicon codicon-verified-filled"
+          style={{ color: 'green' }}
+          title="Permission granted: the subject has this permission on the resource."
+        ></i>
+      );
 
     case LiveCheckItemStatus.INVALID:
-      return <i className="codicon codicon-circle-slash" style={{ color: 'orange' }} title="The check could not be evaluated against the schema (e.g. unknown object type, relation, or permission)."></i>;
+      return (
+        <i
+          className="codicon codicon-circle-slash"
+          style={{ color: 'orange' }}
+          title="The check could not be evaluated against the schema (e.g. unknown object type, relation, or permission)."
+        ></i>
+      );
 
     case LiveCheckItemStatus.CAVEATED:
-      return <i className="codicon codicon-array" style={{ color: 'purple' }} title="Conditionally granted: the result depends on caveat context that is missing or partially evaluated."></i>;
+      return (
+        <i
+          className="codicon codicon-array"
+          style={{ color: 'purple' }}
+          title="Conditionally granted: the result depends on caveat context that is missing or partially evaluated."
+        ></i>
+      );
 
     case LiveCheckItemStatus.NOT_VALID:
-      return <i className="codicon codicon-circle-slash" style={{ color: 'orange' }} title="Invalid input: the resource, permission, or subject field could not be parsed as a relationship."></i>;
+      return (
+        <i
+          className="codicon codicon-circle-slash"
+          style={{ color: 'orange' }}
+          title="Invalid input: the resource, permission, or subject field could not be parsed as a relationship."
+        ></i>
+      );
 
     default:
       return <i className="codicon codicon-debug-step-over" title="Status unknown."></i>;
