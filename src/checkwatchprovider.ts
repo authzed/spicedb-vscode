@@ -4,6 +4,8 @@ import { Uri, Webview } from 'vscode';
 import fs from 'fs';
 import fsp from 'fs/promises';
 
+import { isSpiceDbDocument } from './spicedbDocument';
+
 function getUri(webview: Webview, extensionUri: Uri, pathList: string[]) {
   return webview.asWebviewUri(Uri.joinPath(extensionUri, ...pathList));
 }
@@ -26,15 +28,13 @@ export class CheckWatchProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.onDidReceiveMessage((data) => {
       switch (data.type) {
-        case 'ready':
-          if (
-            vscode.window.activeTextEditor?.document.uri.fsPath.endsWith('.zed') ||
-            vscode.window.activeTextEditor?.document.uri.fsPath.endsWith('.zed.yaml') ||
-            vscode.window.activeTextEditor?.document.languageId === 'spicedb'
-          ) {
-            this.performUpdate(vscode.window.activeTextEditor?.document.uri.fsPath);
+        case 'ready': {
+          const active = vscode.window.activeTextEditor;
+          if (active && isSpiceDbDocument(active.document.uri.fsPath, active.document.languageId)) {
+            this.performUpdate(active.document.uri.fsPath);
           }
           break;
+        }
       }
     });
 
