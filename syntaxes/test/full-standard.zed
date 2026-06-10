@@ -8,8 +8,15 @@ import "imported.zed"
 definition group {
 	relation member: user with is_raining | user with expiration
 	relation member2: user:* with non_expired_grant
+	relation _internal: user
 	...secret
 	permission supersecret = secretview // defined in the partial
+	permission _hidden = _internal
+}
+
+definition _private_type {
+	relation owner: user
+	permission _view = owner
 }
 
 definition document {
@@ -37,6 +44,10 @@ definition document {
 
 caveat non_expired_grant(name string, description string) {
   name.matches("-$test") || size(description) >= 100
+}
+
+caveat _internal_caveat(flag bool) {
+  flag == true
 }
 
 partial view_secret {
