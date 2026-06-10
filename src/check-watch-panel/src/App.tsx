@@ -322,30 +322,65 @@ function WatchRow(props: {
 function StatusIcon(props: { item: LiveCheckItem }) {
   // Icon reference: https://code.visualstudio.com/api/references/icons-in-labels
   if (props.item.errorMessage) {
-    return <i className="codicon codicon-alert" style={{ color: 'yellow' }}></i>;
+    return <i className="codicon codicon-alert" style={{ color: 'yellow' }} title={`Error: ${props.item.errorMessage}`}></i>;
   }
 
   switch (props.item.status) {
     case LiveCheckItemStatus.NOT_CHECKED:
-      return <i className="codicon codicon-circle-large-outline"></i>;
+      return (
+        <i
+          className="codicon codicon-circle-large-outline"
+          title="Not checked yet. This usually means the schema or relationships failed to parse — see the error message above the watches."
+        ></i>
+      );
 
     case LiveCheckItemStatus.NOT_FOUND:
-      return <i className="codicon codicon-stop" style={{ color: 'red' }}></i>;
+      return (
+        <i
+          className="codicon codicon-stop"
+          style={{ color: 'red' }}
+          title="Permission denied: the subject does not have this permission on the resource."
+        ></i>
+      );
 
     case LiveCheckItemStatus.FOUND:
-      return <i className="codicon codicon-verified-filled" style={{ color: 'green' }}></i>;
+      return (
+        <i
+          className="codicon codicon-verified-filled"
+          style={{ color: 'green' }}
+          title="Permission granted: the subject has this permission on the resource."
+        ></i>
+      );
 
     case LiveCheckItemStatus.INVALID:
-      return <i className="codicon codicon-circle-slash" style={{ color: 'orange' }}></i>;
+      return (
+        <i
+          className="codicon codicon-circle-slash"
+          style={{ color: 'orange' }}
+          title="The check could not be evaluated against the schema (e.g. unknown object type, relation, or permission)."
+        ></i>
+      );
 
     case LiveCheckItemStatus.CAVEATED:
-      return <i className="codicon codicon-array" style={{ color: 'purple' }}></i>;
+      return (
+        <i
+          className="codicon codicon-array"
+          style={{ color: 'purple' }}
+          title="Conditionally granted: the result depends on caveat context that is missing or partially evaluated."
+        ></i>
+      );
 
     case LiveCheckItemStatus.NOT_VALID:
-      return <i className="codicon codicon-circle-slash" style={{ color: 'orange' }}></i>;
+      return (
+        <i
+          className="codicon codicon-circle-slash"
+          style={{ color: 'orange' }}
+          title="Invalid input: the resource, permission, or subject field could not be parsed as a relationship."
+        ></i>
+      );
 
     default:
-      return <i className="codicon codicon-debug-step-over"></i>;
+      return <i className="codicon codicon-debug-step-over" title="Status unknown."></i>;
   }
 }
 

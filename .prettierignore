@@ -1,0 +1,6 @@
+out
+dist
+node_modules
+src/check-watch-panel/build
+src/check-watch-panel/node_modules
+*.vsix
