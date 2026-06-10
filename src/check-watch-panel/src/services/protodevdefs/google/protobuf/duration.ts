@@ -32,21 +32,21 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-import type { BinaryWriteOptions } from '@protobuf-ts/runtime';
-import type { IBinaryWriter } from '@protobuf-ts/runtime';
-import { WireType } from '@protobuf-ts/runtime';
-import type { BinaryReadOptions } from '@protobuf-ts/runtime';
-import type { IBinaryReader } from '@protobuf-ts/runtime';
-import { UnknownFieldHandler } from '@protobuf-ts/runtime';
-import type { PartialMessage } from '@protobuf-ts/runtime';
-import { reflectionMergePartial } from '@protobuf-ts/runtime';
-import { MESSAGE_TYPE } from '@protobuf-ts/runtime';
-import { typeofJsonValue } from '@protobuf-ts/runtime';
-import type { JsonValue } from '@protobuf-ts/runtime';
-import type { JsonReadOptions } from '@protobuf-ts/runtime';
-import type { JsonWriteOptions } from '@protobuf-ts/runtime';
-import { PbLong } from '@protobuf-ts/runtime';
-import { MessageType } from '@protobuf-ts/runtime';
+import type { BinaryWriteOptions } from "@protobuf-ts/runtime";
+import type { IBinaryWriter } from "@protobuf-ts/runtime";
+import { WireType } from "@protobuf-ts/runtime";
+import type { BinaryReadOptions } from "@protobuf-ts/runtime";
+import type { IBinaryReader } from "@protobuf-ts/runtime";
+import { UnknownFieldHandler } from "@protobuf-ts/runtime";
+import type { PartialMessage } from "@protobuf-ts/runtime";
+import { reflectionMergePartial } from "@protobuf-ts/runtime";
+import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
+import { typeofJsonValue } from "@protobuf-ts/runtime";
+import type { JsonValue } from "@protobuf-ts/runtime";
+import type { JsonReadOptions } from "@protobuf-ts/runtime";
+import type { JsonWriteOptions } from "@protobuf-ts/runtime";
+import { PbLong } from "@protobuf-ts/runtime";
+import { MessageType } from "@protobuf-ts/runtime";
 
 /**
  * A Duration represents a signed, fixed-length span of time represented
@@ -135,9 +135,9 @@ export interface Duration {
 // @generated message type with reflection information, may provide speed optimized methods
 class Duration$Type extends MessageType<Duration> {
   constructor() {
-    super('google.protobuf.Duration', [
-      { no: 1, name: 'seconds', kind: 'scalar', T: 3 /*ScalarType.INT64*/ },
-      { no: 2, name: 'nanos', kind: 'scalar', T: 5 /*ScalarType.INT32*/ },
+    super("google.protobuf.Duration", [
+      { no: 1, name: "seconds", kind: "scalar", T: 3 /*ScalarType.INT64*/ },
+      { no: 2, name: "nanos", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
     ]);
   }
   /**
@@ -145,44 +145,53 @@ class Duration$Type extends MessageType<Duration> {
    */
   internalJsonWrite(message: Duration, options: JsonWriteOptions): JsonValue {
     let s = PbLong.from(message.seconds).toNumber();
-    if (s > 315576000000 || s < -315576000000) throw new Error('Duration value out of range.');
+    if (s > 315576000000 || s < -315576000000) throw new Error("Duration value out of range.");
     let text = message.seconds.toString();
-    if (s === 0 && message.nanos < 0) text = '-' + text;
+    if (s === 0 && message.nanos < 0) text = "-" + text;
     if (message.nanos !== 0) {
       let nanosStr = Math.abs(message.nanos).toString();
-      nanosStr = '0'.repeat(9 - nanosStr.length) + nanosStr;
-      if (nanosStr.substring(3) === '000000') nanosStr = nanosStr.substring(0, 3);
-      else if (nanosStr.substring(6) === '000') nanosStr = nanosStr.substring(0, 6);
-      text += '.' + nanosStr;
+      nanosStr = "0".repeat(9 - nanosStr.length) + nanosStr;
+      if (nanosStr.substring(3) === "000000") nanosStr = nanosStr.substring(0, 3);
+      else if (nanosStr.substring(6) === "000") nanosStr = nanosStr.substring(0, 6);
+      text += "." + nanosStr;
     }
-    return text + 's';
+    return text + "s";
   }
   /**
    * Decode `Duration` from JSON string like "3.000001s"
    */
   internalJsonRead(json: JsonValue, options: JsonReadOptions, target?: Duration): Duration {
-    if (typeof json !== 'string') throw new Error('Unable to parse Duration from JSON ' + typeofJsonValue(json) + '. Expected string.');
+    if (typeof json !== "string")
+      throw new Error(
+        "Unable to parse Duration from JSON " + typeofJsonValue(json) + ". Expected string.",
+      );
     let match = json.match(/^(-?)([0-9]+)(?:\.([0-9]+))?s/);
-    if (match === null) throw new Error('Unable to parse Duration from JSON string. Invalid format.');
+    if (match === null)
+      throw new Error("Unable to parse Duration from JSON string. Invalid format.");
     if (!target) target = this.create();
     let [, sign, secs, nanos] = match;
     let longSeconds = PbLong.from(sign + secs);
     if (longSeconds.toNumber() > 315576000000 || longSeconds.toNumber() < -315576000000)
-      throw new Error('Unable to parse Duration from JSON string. Value out of range.');
+      throw new Error("Unable to parse Duration from JSON string. Value out of range.");
     target.seconds = longSeconds.toString();
-    if (typeof nanos == 'string') {
-      let nanosStr = sign + nanos + '0'.repeat(9 - nanos.length);
+    if (typeof nanos == "string") {
+      let nanosStr = sign + nanos + "0".repeat(9 - nanos.length);
       target.nanos = parseInt(nanosStr);
     }
     return target;
   }
   create(value?: PartialMessage<Duration>): Duration {
-    const message = { seconds: '0', nanos: 0 };
+    const message = { seconds: "0", nanos: 0 };
     globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
     if (value !== undefined) reflectionMergePartial<Duration>(this, message, value);
     return message;
   }
-  internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Duration): Duration {
+  internalBinaryRead(
+    reader: IBinaryReader,
+    length: number,
+    options: BinaryReadOptions,
+    target?: Duration,
+  ): Duration {
     let message = target ?? this.create(),
       end = reader.pos + length;
     while (reader.pos < end) {
@@ -196,16 +205,30 @@ class Duration$Type extends MessageType<Duration> {
           break;
         default:
           let u = options.readUnknownField;
-          if (u === 'throw') throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+          if (u === "throw")
+            throw new globalThis.Error(
+              `Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`,
+            );
           let d = reader.skip(wireType);
-          if (u !== false) (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+          if (u !== false)
+            (u === true ? UnknownFieldHandler.onRead : u)(
+              this.typeName,
+              message,
+              fieldNo,
+              wireType,
+              d,
+            );
       }
     }
     return message;
   }
-  internalBinaryWrite(message: Duration, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+  internalBinaryWrite(
+    message: Duration,
+    writer: IBinaryWriter,
+    options: BinaryWriteOptions,
+  ): IBinaryWriter {
     /* int64 seconds = 1; */
-    if (message.seconds !== '0') writer.tag(1, WireType.Varint).int64(message.seconds);
+    if (message.seconds !== "0") writer.tag(1, WireType.Varint).int64(message.seconds);
     /* int32 nanos = 2; */
     if (message.nanos !== 0) writer.tag(2, WireType.Varint).int32(message.nanos);
     let u = options.writeUnknownFields;

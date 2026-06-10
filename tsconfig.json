@@ -7,11 +7,13 @@
     "sourceMap": true,
     "rootDir": "src",
     "skipLibCheck": true,
+    "moduleResolution": "nodenext",
     "strict": true,
     /* Additional Checks */
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    "types": ["node", "mocha"]
   },
   "exclude": ["src/check-watch-panel/**/*", "node_modules", ".vscode-test"]
 }

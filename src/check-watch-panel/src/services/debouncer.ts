@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef } from "react";
 
 enum CheckerStatus {
   SLEEPING = 0,
@@ -37,7 +37,7 @@ export function useDebouncedChecker<T>(rate: number, checker: (arg: T) => Promis
       return;
     }
 
-    (async () => {
+    void (async () => {
       state.current = {
         status: CheckerStatus.RUNNING,
         runIndex: existingIndex,
@@ -63,7 +63,7 @@ export function useDebouncedChecker<T>(rate: number, checker: (arg: T) => Promis
   return {
     run: (arg: T) => {
       // To prevent it blocking the main thread.
-      (async () => {
+      void (async () => {
         if (state.current.status === CheckerStatus.SLEEPING) {
           const currentIndex = state.current.runIndex + 1;
           state.current = {

@@ -15,5 +15,5 @@ if [ ! -f "$WASM_EXEC_FILE" ]; then
 fi
 
 cd src/check-watch-panel
-yarn install
-yarn build
+pnpm install
+pnpm build
