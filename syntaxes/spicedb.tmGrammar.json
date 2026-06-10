@@ -97,7 +97,7 @@
           "name": "punctuation.definition.colon"
         },
         "3": {
-          "name": "keyword.operator.wildcard markup.bold.authzed"
+          "name": "constant.language.wildcard.spicedb"
         }
       }
     },
@@ -121,7 +121,7 @@
           "name": "punctuation.definition.hash"
         },
         "3": {
-          "name": "entity.name.variable"
+          "name": "variable.other.member.spicedb"
         }
       }
     },
@@ -152,10 +152,10 @@
     },
     "nil": {
       "comment": "nil reference",
-      "match": "nil",
+      "match": "\\b(nil)\\b",
       "captures": {
         "1": {
-          "name": "keyword.operator.nil"
+          "name": "constant.language.nil.spicedb"
         }
       }
     },
@@ -164,7 +164,7 @@
       "match": "([a-zA-Z_]\\w*)\\b(?!->|\\.(?:any|all)\\()",
       "captures": {
         "1": {
-          "name": "entity.name.variable"
+          "name": "variable.other.member.spicedb"
         }
       }
     },
@@ -182,13 +182,13 @@
       "match": "\\s*([a-zA-Z_]\\w*)(->)([a-zA-Z_]\\w*)\\s*",
       "captures": {
         "1": {
-          "name": "entity.name.variable"
+          "name": "variable.other.member.spicedb"
         },
         "2": {
-          "name": "keyword.operator.arrow markup.bold.authzed"
+          "name": "keyword.operator.arrow.spicedb"
         },
         "3": {
-          "name": "entity.name.variable"
+          "name": "variable.other.member.spicedb"
         }
       }
     },
@@ -197,13 +197,13 @@
       "match": "\\s*([a-zA-Z_]\\w*)(\\.any)\\(([a-zA-Z_]\\w*)\\)\\s*",
       "captures": {
         "1": {
-          "name": "entity.name.variable"
+          "name": "variable.other.member.spicedb"
         },
         "2": {
-          "name": "keyword.operator.arrow markup.bold.authzed"
+          "name": "keyword.operator.arrow.spicedb"
         },
         "3": {
-          "name": "entity.name.variable"
+          "name": "variable.other.member.spicedb"
         }
       }
     },
@@ -212,13 +212,13 @@
       "match": "\\s*([a-zA-Z_]\\w*)(\\.all)\\(([a-zA-Z_]\\w*)\\)\\s*",
       "captures": {
         "1": {
-          "name": "entity.name.variable"
+          "name": "variable.other.member.spicedb"
         },
         "2": {
-          "name": "keyword.operator.arrow markup.bold.authzed"
+          "name": "keyword.operator.arrow.spicedb"
         },
         "3": {
-          "name": "entity.name.variable"
+          "name": "variable.other.member.spicedb"
         }
       }
     },
@@ -330,7 +330,7 @@
           "name": "keyword.class.definition"
         },
         "2": {
-          "name": "keyword.class.definition"
+          "name": "support.type.expiration.spicedb"
         }
       }
     }
