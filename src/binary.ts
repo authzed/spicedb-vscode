@@ -3,6 +3,8 @@ import * as vscode from 'vscode';
 import { execFile } from 'child_process';
 import commandExists from 'command-exists';
 import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
 import * as semver from 'semver';
 import { promisify } from 'util';
 
@@ -14,9 +16,25 @@ export async function languageServerBinaryPath(_context: vscode.ExtensionContext
   const config = vscode.workspace.getConfiguration('spicedb');
   const customPath = config.get<string>('binaryPath');
   if (customPath) {
-    if (fs.existsSync(customPath)) {
+    let resolvedPath: string | undefined;
+    const expandedPath = expandPathVariables(customPath);
+    if (path.isAbsolute(expandedPath)) {
+      resolvedPath = fs.existsSync(expandedPath) ? expandedPath : undefined;
+    } else {
+      for (const workspaceFolder of vscode.workspace.workspaceFolders ?? []) {
+        const folderPath = workspaceFolder.uri.fsPath;
+        const candidatePath = expandPathVariables(customPath, folderPath);
+        const joinedPath = path.isAbsolute(candidatePath) ? candidatePath : path.join(folderPath, candidatePath);
+        if (fs.existsSync(joinedPath)) {
+          resolvedPath = joinedPath;
+          break;
+        }
+      }
+    }
+
+    if (resolvedPath) {
       vscode.window.showInformationMessage(`Using custom SpiceDB binary found at configured path: ${customPath}`);
-      return customPath;
+      return resolvedPath;
     }
     vscode.window.showInformationMessage(`Custom SpiceDB binary specified but not found: ${customPath}`);
   }
@@ -26,6 +44,16 @@ export async function languageServerBinaryPath(_context: vscode.ExtensionContext
   } catch (_e) {
     return undefined;
   }
+}
+
+export function expandPathVariables(binPath: string, workspaceFolder?: string): string {
+  let expanded = binPath.replace(/^~/, os.homedir());
+  if (workspaceFolder) {
+    expanded = expanded
+      .replace(/\$\{workspaceFolder\}|\$\{workspaceRoot\}/g, workspaceFolder)
+      .replace(/\$\{workspaceFolderBasename\}/g, path.basename(workspaceFolder));
+  }
+  return expanded;
 }
 
 const INSTALL_COMMANDS = {
