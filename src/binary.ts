@@ -21,6 +21,8 @@ export async function languageServerBinaryPath(_context: vscode.ExtensionContext
     if (path.isAbsolute(expandedPath)) {
       resolvedPath = fs.existsSync(expandedPath) ? expandedPath : undefined;
     } else {
+      // If the expanded path is not absolute, we iterate over the workspace folders
+      // and attempt to resolve the custom path relative to those workspace folders.
       for (const workspaceFolder of vscode.workspace.workspaceFolders ?? []) {
         const folderPath = workspaceFolder.uri.fsPath;
         const candidatePath = expandPathVariables(customPath, folderPath);
