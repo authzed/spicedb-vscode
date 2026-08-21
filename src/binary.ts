@@ -46,6 +46,8 @@ export async function languageServerBinaryPath(_context: vscode.ExtensionContext
   }
 }
 
+// expandPathVariables adds support for both ~-aliasing of the home folder and
+// VSCode-specific path variables that localize things to a project.
 export function expandPathVariables(binPath: string, workspaceFolder?: string): string {
   let expanded = binPath.replace(/^~/, os.homedir());
   if (workspaceFolder) {
